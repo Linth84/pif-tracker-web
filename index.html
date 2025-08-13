@@ -1,49 +1,42 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PIF Tracker</title>
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="./favicon.ico">
-    <link rel="apple-touch-icon" href="./favicon.ico">
-
-    <!-- Estilos -->
-    <link rel="stylesheet" href="./style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PIF Tracker</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div id="app">
-        <header>
-            <h1 id="app-title">PIF Tracker</h1>
-            <label for="languageSelect">Language / Idioma:</label>
-            <select id="languageSelect">
-                <option value="es">Español</option>
-                <option value="en">English</option>
-            </select>
-        </header>
+<div id="app">
+  <header class="header">
+    <h1 id="app-title">PIF Tracker</h1>
+    <select id="languageSelect" class="lang-select">
+      <option value="es">Español</option>
+      <option value="en">English</option>
+    </select>
+  </header>
 
-        <form id="registroForm">
-            <label for="fecha">Día:</label>
-            <input type="date" id="fecha" required />
+  <form id="registroForm" class="card">
+    <label for="fecha" id="lbl-fecha">Día:</label>
+    <input type="date" id="fecha" required />
 
-            <label for="peso">Peso del gato (kg):</label>
-            <input type="number" step="0.01" id="peso" required />
+    <label for="peso" id="lbl-peso">Peso del gato (kg):</label>
+    <input type="number" step="0.01" id="peso" required />
 
-            <label for="dosis">Dosis diaria (mg/ml):</label>
-            <input type="number" step="0.01" id="dosis" required />
+    <label for="dosis" id="lbl-dosis">Dosis diaria (mg/ml):</label>
+    <input type="number" step="0.01" id="dosis" required />
 
-            <label for="comentarios">Comentarios / Novedades:</label>
-            <textarea id="comentarios" rows="3"></textarea>
+    <label for="comentarios" id="lbl-comentarios">Comentarios / Novedades:</label>
+    <textarea id="comentarios" rows="3"></textarea>
 
-            <button type="submit">Guardar registro</button>
-        </form>
+    <button type="submit" id="btn-guardar">Guardar registro</button>
+  </form>
 
-        <h2>Historial</h2>
-        <div id="historial"></div>
-    </div>
+  <h2 id="history-title">Historial</h2>
+  <div id="historial"></div>
+</div>
 
-    <script src="./script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
 
