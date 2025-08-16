@@ -1,112 +1,82 @@
-let historial = [];
+const formaSelect = document.getElementById("calc-forma");
+const tipoSelect = document.getElementById("calc-tipo");
+const concContainer = document.getElementById("concentracion-container");
+const concSelect = document.getElementById("calc-concentracion");
+const calcForm = document.getElementById("calc-form");
+const resultado = document.getElementById("calc-resultado");
 
-// Traducciones
-const traducciones = {
-    es: {
-        titulo: "PIF Tracker",
-        dia: "Día:",
-        peso: "Peso del gato (kg):",
-        dosis: "Dosis diaria (mg/ml):",
-        comentarios: "Comentarios / Novedades:",
-        guardar: "Guardar registro",
-        historial: "Historial",
-        editar: "Editar",
-        eliminar: "Eliminar"
-    },
-    en: {
-        titulo: "PIF Tracker",
-        dia: "Day:",
-        peso: "Cat weight (kg):",
-        dosis: "Daily dose (mg/ml):",
-        comentarios: "Comments / Updates:",
-        guardar: "Save record",
-        historial: "History",
-        editar: "Edit",
-        eliminar: "Delete"
-    }
+// Tipos de PIF por forma
+const tiposPIF = {
+    inyectable: [
+        { text: "Húmedo 8 mg/kg", value: 8 },
+        { text: "Húmedo 10 mg/kg", value: 10 },
+        { text: "Seco 10 mg/kg", value: 10 },
+        { text: "Ocular 10 mg/kg", value: 10 },
+        { text: "Neurológico 12 mg/kg", value: 12 },
+        { text: "Neurológico 13 mg/kg", value: 13 },
+        { text: "Neurológico 14 mg/kg", value: 14 },
+        { text: "Neurológico 15 mg/kg", value: 15 }
+    ],
+    pastillas: [
+        { text: "Húmedo 8 mg/kg", value: 8 },
+        { text: "Húmedo 10 mg/kg", value: 10 },
+        { text: "Seco 10 mg/kg", value: 10 },
+        { text: "Ocular 10 mg/kg", value: 10 },
+        { text: "Neurológico 12 mg/kg", value: 12 },
+        { text: "Neurológico 15 mg/kg", value: 15 }
+    ]
 };
 
-// Cambiar idioma
-document.getElementById("languageSelect").addEventListener("change", function() {
-    cambiarIdioma(this.value);
-});
-
-function cambiarIdioma(lang) {
-    document.getElementById("app-title").textContent = traducciones[lang].titulo;
-    document.getElementById("lbl-fecha").textContent = traducciones[lang].dia;
-    document.getElementById("lbl-peso").textContent = traducciones[lang].peso;
-    document.getElementById("lbl-dosis").textContent = traducciones[lang].dosis;
-    document.getElementById("lbl-comentarios").textContent = traducciones[lang].comentarios;
-    document.getElementById("btn-guardar").textContent = traducciones[lang].guardar;
-    document.getElementById("history-title").textContent = traducciones[lang].historial;
-    mostrarHistorial();
-}
-
-// Guardar historial en localStorage
-function guardarHistorial() {
-    localStorage.setItem("historialPIF", JSON.stringify(historial));
-}
-
-// Mostrar historial
-function mostrarHistorial() {
-    const lang = document.getElementById("languageSelect").value;
-    const historialDiv = document.getElementById("historial");
-    historialDiv.innerHTML = "";
-
-    historial.forEach((registro, index) => {
-        const div = document.createElement("div");
-        div.innerHTML = `
-            <strong>${registro.fecha}</strong> -
-            ${registro.peso} kg -
-            ${registro.dosis} mg/ml <br>
-            ${registro.comentarios || ""} <br>
-            <button onclick="editarRegistro(${index})">${traducciones[lang].editar}</button>
-            <button onclick="eliminarRegistro(${index})">${traducciones[lang].eliminar}</button>
-        `;
-        historialDiv.appendChild(div);
-    });
-}
-
-// Editar
-function editarRegistro(index) {
-    const registro = historial[index];
-    document.getElementById("fecha").value = registro.fecha;
-    document.getElementById("peso").value = registro.peso;
-    document.getElementById("dosis").value = registro.dosis;
-    document.getElementById("comentarios").value = registro.comentarios;
-    historial.splice(index, 1);
-    guardarHistorial();
-    mostrarHistorial();
-}
-
-// Eliminar
-function eliminarRegistro(index) {
-    historial.splice(index, 1);
-    guardarHistorial();
-    mostrarHistorial();
-}
-
-// Evento submit
-document.getElementById("registroForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    const fecha = document.getElementById("fecha").value;
-    const peso = document.getElementById("peso").value;
-    const dosis = document.getElementById("dosis").value;
-    const comentarios = document.getElementById("comentarios").value;
-
-    historial.push({ fecha, peso, dosis, comentarios });
-    guardarHistorial();
-    mostrarHistorial();
-
-    this.reset();
-});
-
-// Cargar historial al iniciar
-document.addEventListener("DOMContentLoaded", function() {
-    const guardado = localStorage.getItem("historialPIF");
-    if (guardado) {
-        historial = JSON.parse(guardado);
+// Cargar opciones según forma
+formaSelect.addEventListener("change", () => {
+    tipoSelect.innerHTML = "";
+    if (formaSelect.value === "pastillas") {
+        concContainer.style.display = "block";
+    } else {
+        concContainer.style.display = "none";
     }
-    cambiarIdioma("es"); // Idioma por defecto
+    if (tiposPIF[formaSelect.value]) {
+        tiposPIF[formaSelect.value].forEach(opt => {
+            let option = document.createElement("option");
+            option.value = opt.value;
+            option.textContent = opt.text;
+            tipoSelect.appendChild(option);
+        });
+    }
 });
+
+// Calcular dosis
+calcForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const peso = parseFloat(document.getElementById("calc-peso").value);
+    const dosisMgKg = parseFloat(tipoSelect.value);
+
+    if (formaSelect.value === "inyectable") {
+        let concentracion = 15; // mg/ml fijo
+        let dosisTotalMg = peso * dosisMgKg;
+        let dosisMl = dosisTotalMg / concentracion;
+        resultado.textContent = `Dosis: ${dosisMl.toFixed(2)} ml`;
+    } else {
+        let concentracion = parseFloat(concSelect.value);
+        let dosisTotalMg = peso * dosisMgKg;
+        let pastillas = dosisTotalMg / concentracion;
+
+        // Redondeo a .0 o .5
+        let entero = Math.floor(pastillas);
+        let decimal = pastillas - entero;
+        if (decimal > 0 && decimal <= 0.5) decimal = 0.5;
+        else if (decimal > 0.5) { entero += 1; decimal = 0; }
+        pastillas = entero + decimal;
+
+        resultado.textContent = `Dosis: ${pastillas} pastillas`;
+    }
+});
+
+
+
+
+
+
+
+
+
