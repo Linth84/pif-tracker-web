@@ -1,4 +1,4 @@
-// ======= Elementos =======
+// ===================== Elementos base =====================
 const languageSelect = document.getElementById("languageSelect");
 
 // Calculadora
@@ -13,7 +13,7 @@ const resultado = document.getElementById("calc-resultado");
 const registroForm = document.getElementById("registroForm");
 const historialDiv = document.getElementById("historial");
 
-// ======= Traducciones =======
+// ===================== Traducciones =====================
 const i18n = {
   es: {
     languageLabel: "Idioma / Language:",
@@ -26,6 +26,7 @@ const i18n = {
     concentracion: "Concentración (mg):",
     btnCalcular: "Calcular",
     resultadoLabel: "Dosis:",
+    advertencia: "La calculadora es solo un estimado, consulte siempre a su veterinario/a.",
     // Registro
     registroDia: "Día:",
     registroPeso: "Peso del gato (kg):",
@@ -33,15 +34,15 @@ const i18n = {
     registroComentarios: "Comentarios / Novedades:",
     btnGuardar: "Guardar registro",
     historialTitle: "Historial",
-    // Acciones historial
+    // Acciones
     editar: "✏️ Editar",
     eliminar: "🗑️ Eliminar",
     guardar: "💾 Guardar",
     cancelar: "✖️ Cancelar",
-    // Unidades resultado
+    // Unidades
     unidadesMl: "ml",
     unidadesTablets: "pastillas",
-    // Tipos PIF
+    // Tipos (etiquetas visibles)
     pif: {
       wet8: "Húmedo 8 mg/kg",
       wet10: "Húmedo 10 mg/kg",
@@ -64,6 +65,7 @@ const i18n = {
     concentracion: "Concentration (mg):",
     btnCalcular: "Calculate",
     resultadoLabel: "Dosage:",
+    advertencia: "This calculator is only an estimate; always consult your veterinarian.",
     // Registro
     registroDia: "Day:",
     registroPeso: "Cat weight (kg):",
@@ -79,7 +81,7 @@ const i18n = {
     // Unidades
     unidadesMl: "ml",
     unidadesTablets: "tablets",
-    // Tipos PIF
+    // Tipos
     pif: {
       wet8: "Wet 8 mg/kg",
       wet10: "Wet 10 mg/kg",
@@ -93,7 +95,7 @@ const i18n = {
   }
 };
 
-// ======= Datos de PIF =======
+// ===================== Tipos por forma =====================
 const PIF_TYPES = {
   inyectable: [
     { key: "wet8", dose: 8 },
@@ -115,13 +117,8 @@ const PIF_TYPES = {
   ]
 };
 
-// ======= Utilidades =======
+// ===================== Utilidades =====================
 const t = (key) => i18n[languageSelect.value][key];
-
-function setText(selector, key) {
-  const el = document.querySelector(selector);
-  if (el) el.textContent = i18n[languageSelect.value][key];
-}
 
 function translateStaticTexts() {
   document.querySelectorAll("[data-translate]").forEach(el => {
@@ -132,47 +129,44 @@ function translateStaticTexts() {
 }
 
 function ceilToHalf(x) {
-  // redondeo SIEMPRE hacia arriba al múltiplo de 0.5
+  // redondear SIEMPRE hacia arriba al múltiplo 0.5
   return Math.ceil((x - 1e-9) * 2) / 2;
 }
 
-// ======= UI dinámica =======
+// ===================== Poblar selects =====================
 function populateForma() {
+  const lang = languageSelect.value;
   formaSelect.innerHTML = "";
   const optIny = document.createElement("option");
   optIny.value = "inyectable";
-  optIny.textContent = i18n[languageSelect.value].injectable;
+  optIny.textContent = i18n[lang].injectable;
 
   const optTab = document.createElement("option");
   optTab.value = "pastillas";
-  optTab.textContent = i18n[languageSelect.value].tablets;
+  optTab.textContent = i18n[lang].tablets;
 
   formaSelect.appendChild(optIny);
   formaSelect.appendChild(optTab);
 }
 
 function populateTipos() {
-  tipoSelect.innerHTML = "";
-  const forma = formaSelect.value;
   const lang = languageSelect.value;
+  const forma = formaSelect.value;
+  tipoSelect.innerHTML = "";
 
-  if (forma === "pastillas") {
-    concContainer.style.display = "";
-  } else {
-    concContainer.style.display = "none";
-  }
+  // Mostrar/ocultar concentración según forma
+  concContainer.style.display = (forma === "pastillas") ? "block" : "none";
 
-  PIF_TYPES[forma].forEach(item => {
+  (PIF_TYPES[forma] || []).forEach(item => {
     const opt = document.createElement("option");
-    opt.value = item.dose; // guardamos la dosis numérica
-    opt.dataset.key = item.key; // clave para traducir etiqueta
+    opt.value = item.dose;      // valor numérico de mg/kg
+    opt.dataset.key = item.key; // clave para traducir
     opt.textContent = i18n[lang].pif[item.key];
     tipoSelect.appendChild(opt);
   });
 }
 
 function refreshTipoLabels() {
-  // traduce los textos de las opciones según el idioma actual
   const lang = languageSelect.value;
   Array.from(tipoSelect.options).forEach(opt => {
     const k = opt.dataset.key;
@@ -182,7 +176,7 @@ function refreshTipoLabels() {
   });
 }
 
-// ======= Cálculo =======
+// ===================== Cálculo =====================
 calcForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const peso = parseFloat(document.getElementById("calc-peso").value || "0");
@@ -196,23 +190,28 @@ calcForm.addEventListener("submit", (e) => {
   if (formaSelect.value === "inyectable") {
     // 15 mg/ml fijo
     const ml = (peso * dosisMgKg) / 15;
-    resultado.textContent = `${t("resultadoLabel")} ${ml.toFixed(2)} ${t("unidadesMl")}`;
+    resultado.innerHTML = `${t("resultadoLabel")} ${ml.toFixed(2)} ${t("unidadesMl")} <span class="calc-warning"> ${t("advertencia")}</span>`;
   } else {
-    // Pastillas con tu regla:
-    // 15 mg → 3 kg y 8 mg/kg => 3 pastillas (no 1.5)
-    // Generalizamos con un factor "mg efectivos" por tableta:
-    // 15 mg -> 8 mg efectivos por tableta; 30 mg -> 16 mg efectivos por tableta
+    // Pastillas: usar mg efectivos por tableta según concentración
+    // 15 mg ⇒ 8 mg efectivos/tab; 30 mg ⇒ 16 mg efectivos/tab
     const conc = parseFloat(concSelect.value || "15");
-    const mgEfectivos = conc === 15 ? 8 : 16;
+    const mgEfectivos = (conc === 15) ? 8 : 16;
 
-    const tabletsRaw = (peso * dosisMgKg) / mgEfectivos;
-    const tablets = ceilToHalf(tabletsRaw);
+    const rawTabs = (peso * dosisMgKg) / mgEfectivos;
+    const tabs = ceilToHalf(rawTabs);
 
-    resultado.textContent = `${t("resultadoLabel")} ${tablets} ${t("unidadesTablets")}`;
+    resultado.innerHTML = `${t("resultadoLabel")} ${tabs} ${t("unidadesTablets")} <span class="calc-warning"> ${t("advertencia")}</span>`;
   }
+
+  // Mostrar anuncio (si corre dentro de Android)
+  try {
+    if (window.Android && typeof window.Android.showAd === "function") {
+      window.Android.showAd();
+    }
+  } catch (_) {}
 });
 
-// ======= Registro & Historial (simple con edición/eliminación) =======
+// ===================== Registro & Historial =====================
 function loadHistorial() {
   const data = JSON.parse(localStorage.getItem("pif_historial") || "[]");
   historialDiv.innerHTML = "";
@@ -223,9 +222,9 @@ function loadHistorial() {
     const left = document.createElement("div");
     left.innerHTML = `
       <div><strong>${item.fecha}</strong></div>
-      <div>${t("registroPeso")} ${item.peso} kg</div>
-      <div>${t("registroDosis")} ${item.dosis}</div>
-      <div>${t("registroComentarios")} ${item.comentarios || "-"}</div>
+      <div>${i18n[languageSelect.value].registroPeso} ${item.peso} kg</div>
+      <div>${i18n[languageSelect.value].registroDosis} ${item.dosis}</div>
+      <div>${i18n[languageSelect.value].registroComentarios} ${item.comentarios || "-"}</div>
     `;
 
     const btns = document.createElement("div");
@@ -233,11 +232,11 @@ function loadHistorial() {
 
     const bEdit = document.createElement("button");
     bEdit.className = "edit";
-    bEdit.textContent = t("editar");
+    bEdit.textContent = i18n[languageSelect.value].editar;
 
     const bDel = document.createElement("button");
     bDel.className = "delete";
-    bDel.textContent = t("eliminar");
+    bDel.textContent = i18n[languageSelect.value].eliminar;
 
     bEdit.addEventListener("click", () => startEdit(idx));
     bDel.addEventListener("click", () => deleteItem(idx));
@@ -256,7 +255,6 @@ function startEdit(index) {
   const item = data[index];
   if (!item) return;
 
-  // Reemplazar fila por inputs
   const rows = historialDiv.querySelectorAll(".historial-item");
   const row = rows[index];
   row.innerHTML = "";
@@ -275,11 +273,11 @@ function startEdit(index) {
 
   const bSave = document.createElement("button");
   bSave.className = "edit";
-  bSave.textContent = t("guardar");
+  bSave.textContent = i18n[languageSelect.value].guardar;
 
   const bCancel = document.createElement("button");
   bCancel.className = "delete";
-  bCancel.textContent = t("cancelar");
+  bCancel.textContent = i18n[languageSelect.value].cancelar;
 
   bSave.addEventListener("click", () => {
     item.fecha = document.getElementById("e_fecha").value;
@@ -307,44 +305,49 @@ function deleteItem(index) {
   loadHistorial();
 }
 
-registroForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const item = {
-    fecha: document.getElementById("fecha").value,
-    peso: parseFloat(document.getElementById("peso").value || "0"),
-    dosis: parseFloat(document.getElementById("dosis").value || "0"),
-    comentarios: document.getElementById("comentarios").value || ""
-  };
-  const data = JSON.parse(localStorage.getItem("pif_historial") || "[]");
-  data.unshift(item);
-  localStorage.setItem("pif_historial", JSON.stringify(data));
-  registroForm.reset();
-  loadHistorial();
-});
+if (registroForm) {
+  registroForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const item = {
+      fecha: document.getElementById("fecha").value,
+      peso: parseFloat(document.getElementById("peso").value || "0"),
+      dosis: parseFloat(document.getElementById("dosis").value || "0"),
+      comentarios: document.getElementById("comentarios").value || ""
+    };
+    const data = JSON.parse(localStorage.getItem("pif_historial") || "[]");
+    data.unshift(item);
+    localStorage.setItem("pif_historial", JSON.stringify(data));
+    registroForm.reset();
+    loadHistorial();
 
-// ======= Idioma =======
+    // Anuncio al guardar (Android)
+    try {
+      if (window.Android && typeof window.Android.showAd === "function") {
+        window.Android.showAd();
+      }
+    } catch (_) {}
+  });
+}
+
+// ===================== Idioma y arranque =====================
 function applyTranslations() {
   translateStaticTexts();
-  populateForma();     // recrea opciones (inyectable/pastillas) traducidas
-  populateTipos();     // recrea tipos de PIF traducidos según forma actual
-  refreshTipoLabels(); // asegura traducción de opciones
+  populateForma();     // inyecta etiquetas traducidas
+  populateTipos();     // inyecta tipos traducidos
+  refreshTipoLabels(); // por si ya existían
   loadHistorial();     // refresca textos en historial
 }
 
 languageSelect.addEventListener("change", applyTranslations);
 formaSelect.addEventListener("change", populateTipos);
 
-// ======= Init =======
 window.addEventListener("DOMContentLoaded", () => {
-  // idioma por defecto: es
+  // por defecto ES + inyectable
   languageSelect.value = "es";
   applyTranslations();
-
-  // set valores por defecto
   formaSelect.value = "inyectable";
-  populateTipos();
+  populateTipos(); // asegura que aparezcan las opciones desde el inicio
 });
-
 
 
 

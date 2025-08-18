@@ -85,6 +85,15 @@ header h1 {
   font-weight: bold;
 }
 
+/* Advertencia */
+.advertencia {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #b00020;
+  font-style: italic;
+}
+
 /* Formulario de registro */
 #registroForm label {
   display: block;
@@ -169,8 +178,6 @@ header h1 {
 .historial-btns .delete:hover {
   background-color: #c82333;
 }
-
-
 
 
 
