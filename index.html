@@ -3,76 +3,92 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PIF Tracker</title>
-  <link rel="stylesheet" href="style.css"/>
+  <title>PIF/FIP Tracker</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="app">
     <header>
-      <h1 id="app-title">PIF Tracker</h1>
-
-      <label for="languageSelect" id="lbl-language" data-translate="languageLabel">
-        Idioma / Language:
-      </label>
+      <h1 data-translate="calcTitle"></h1>
       <select id="languageSelect">
         <option value="es">Español</option>
         <option value="en">English</option>
       </select>
     </header>
 
-    <!-- Calculadora de dosis -->
+    <!-- Calculadora -->
     <section id="calc-section">
-      <h2 data-translate="calcTitle">Calculadora de dosis</h2>
-
+      <h2 data-translate="formAdmin"></h2>
       <form id="calc-form">
-        <label for="calc-forma" data-translate="formAdmin">Forma de administración:</label>
-        <select id="calc-forma"></select>
+        <label for="calc-forma" data-translate="formAdmin"></label>
+        <select id="calc-forma">
+          <option value="inyectable" data-translate="inyectable"></option>
+          <option value="pastillas" data-translate="pastillas"></option>
+          <option value="oral" data-translate="oral"></option>
+          <option value="custom" data-translate="custom"></option>
+        </select>
 
-        <label for="calc-tipo" data-translate="tipoPIF">Tipo de PIF:</label>
-        <select id="calc-tipo"></select>
-
-        <div id="concentracion-container" style="display:none;">
-          <label for="calc-concentracion" data-translate="concentracion">Concentración (mg):</label>
-          <select id="calc-concentracion">
-            <option value="15">15</option>
-            <option value="30">30</option>
-          </select>
+        <!-- Tipo de PIF -->
+        <div id="tipo-container">
+          <label for="calc-tipo" data-translate="tipoPIF"></label>
+          <select id="calc-tipo"></select>
         </div>
 
-        <label for="calc-peso" data-translate="pesoGato">Peso del gato (kg):</label>
-        <input type="number" id="calc-peso" step="0.01" required>
+        <!-- Concentración -->
+        <div id="concentracion-container"></div>
 
-        <button type="submit" id="btn-calcular" data-translate="btnCalcular">Calcular</button>
+        <!-- Custom -->
+        <div id="custom-fields" style="display:none;">
+          <label data-translate="subformaLabel"></label>
+          <select id="custom-subforma">
+            <option value="inyectable" data-translate="inyectable"></option>
+            <option value="pastillas" data-translate="pastillas"></option>
+            <option value="oral" data-translate="oral"></option>
+          </select>
+
+          <label data-translate="customDosage"></label>
+          <input type="number" id="custom-dosage" step="0.1" />
+
+          <label id="label-concentration" data-translate="customConcentration"></label>
+          <input type="number" id="custom-concentration" step="0.1" />
+        </div>
+
+        <!-- Peso -->
+        <label for="calc-peso" data-translate="pesoGato"></label>
+        <input type="number" id="calc-peso" step="0.1"/>
+
+        <button id="btn-calcular" type="submit" data-translate="btnCalcular"></button>
       </form>
-
-      <p id="calc-resultado" data-translate="resultadoLabel">Dosis:</p>
+      <div id="calc-resultado"></div>
+      <span class="advertencia" data-translate="advertencia"></span>
     </section>
 
-    <!-- Formulario de registro -->
-    <form id="registroForm">
-      <label for="fecha" data-translate="registroDia">Día:</label>
-      <input type="date" id="fecha" required>
+    <!-- Registro -->
+    <section id="registro-section">
+      <h2 data-translate="historialTitle"></h2>
+      <form id="registro-form">
+        <label for="registro-dia" data-translate="registroDia"></label>
+        <input type="date" id="registro-dia" />
 
-      <label for="peso" data-translate="registroPeso">Peso del gato (kg):</label>
-      <input type="number" step="0.01" id="peso" required>
+        <label for="registro-peso" data-translate="registroPeso"></label>
+        <input type="number" id="registro-peso" step="0.1"/>
 
-      <label for="dosis" data-translate="registroDosis">Dosis diaria (mg/ml):</label>
-      <input type="number" step="0.01" id="dosis" required>
+        <label for="registro-dosis" data-translate="registroDosis"></label>
+        <input type="text" id="registro-dosis" />
 
-      <label for="comentarios" data-translate="registroComentarios">Comentarios / Novedades:</label>
-      <textarea id="comentarios" rows="3"></textarea>
+        <label for="registro-comentarios" data-translate="registroComentarios"></label>
+        <textarea id="registro-comentarios" rows="2"></textarea>
 
-      <button type="submit" id="btn-guardar" data-translate="btnGuardar">Guardar registro</button>
-    </form>
+        <button id="btn-guardar" type="submit" data-translate="btnGuardar"></button>
+      </form>
 
-    <!-- Historial -->
-    <h2 id="history-title" data-translate="historialTitle">Historial</h2>
-    <div id="historial"></div>
+      <div id="historial"></div>
+    </section>
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>
+
 
 
 

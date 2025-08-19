@@ -1,353 +1,392 @@
-// ===================== Elementos base =====================
+/******************************
+ * PIF/FIP Tracker – script.js
+ ******************************/
+
+// ---------- Elementos de UI ----------
 const languageSelect = document.getElementById("languageSelect");
 
 // Calculadora
+const calcForm = document.getElementById("calc-form");
 const formaSelect = document.getElementById("calc-forma");
+const tipoContainer = document.getElementById("tipo-container");
 const tipoSelect = document.getElementById("calc-tipo");
 const concContainer = document.getElementById("concentracion-container");
-const concSelect = document.getElementById("calc-concentracion");
-const calcForm = document.getElementById("calc-form");
+
+const customFields = document.getElementById("custom-fields");
+const customSubforma = document.getElementById("custom-subforma");
+const customDosage = document.getElementById("custom-dosage");
+const customConcentration = document.getElementById("custom-concentration");
+
+const inputPeso = document.getElementById("calc-peso");
 const resultado = document.getElementById("calc-resultado");
 
-// Registro / Historial
-const registroForm = document.getElementById("registroForm");
-const historialDiv = document.getElementById("historial");
+// Registro / historial
+const registroForm = document.getElementById("registro-form");
+const regDia = document.getElementById("registro-dia");
+const regPeso = document.getElementById("registro-peso");
+const regDosis = document.getElementById("registro-dosis");
+const regComentarios = document.getElementById("registro-comentarios");
+const historialList = document.getElementById("historial");
 
-// ===================== Traducciones =====================
+// ---------- i18n ----------
 const i18n = {
   es: {
-    languageLabel: "Idioma / Language:",
-    calcTitle: "Calculadora de dosis",
+    calcTitle: "PIF Tracker",
     formAdmin: "Forma de administración:",
-    injectable: "Inyectable",
-    tablets: "Pastillas",
+    inyectable: "Inyectable",
+    pastillas: "Pastillas",
+    oral: "Oral (líquido)",
+    custom: "Personalizado",
     tipoPIF: "Tipo de PIF:",
     pesoGato: "Peso del gato (kg):",
-    concentracion: "Concentración (mg):",
+    concentracion: "Concentración:",
+    concentracionUnitsMl: "mg/ml",
+    concentracionUnitsTab: "mg por pastilla",
     btnCalcular: "Calcular",
-    resultadoLabel: "Dosis:",
     advertencia: "La calculadora es solo un estimado, consulte siempre a su veterinario/a.",
-    // Registro
+    // Etiquetas Custom
+    subformaLabel: "Modo personalizado:",
+    customDosage: "Dosaje (mg/kg):",
+    customConcentration: "Concentración:",
+    // Términos para tipos
+    terms: {
+      wet: "Húmedo",
+      dry: "Seco",
+      ocular: "Ocular",
+      neuro: "Neurológico"
+    },
+    // Unidades
+    ml: "ml",
+    tablets: "pastillas",
+    // Historial
+    historialTitle: "Historial",
     registroDia: "Día:",
-    registroPeso: "Peso del gato (kg):",
-    registroDosis: "Dosis diaria (mg/ml):",
+    registroPeso: "Peso:",
+    registroDosis: "Dosis:",
     registroComentarios: "Comentarios / Novedades:",
     btnGuardar: "Guardar registro",
-    historialTitle: "Historial",
-    // Acciones
     editar: "✏️ Editar",
-    eliminar: "🗑️ Eliminar",
+    borrar: "🗑️ Borrar",
     guardar: "💾 Guardar",
-    cancelar: "✖️ Cancelar",
-    // Unidades
-    unidadesMl: "ml",
-    unidadesTablets: "pastillas",
-    // Tipos (etiquetas visibles)
-    pif: {
-      wet8: "Húmedo 8 mg/kg",
-      wet10: "Húmedo 10 mg/kg",
-      dry10: "Seco 10 mg/kg",
-      ocular10: "Ocular 10 mg/kg",
-      neuro12: "Neurológico 12 mg/kg",
-      neuro13: "Neurológico 13 mg/kg",
-      neuro14: "Neurológico 14 mg/kg",
-      neuro15: "Neurológico 15 mg/kg"
-    }
+    cancelar: "✖️ Cancelar"
   },
   en: {
-    languageLabel: "Language:",
-    calcTitle: "Dosage Calculator",
+    calcTitle: "FIP Tracker",
     formAdmin: "Administration form:",
-    injectable: "Injectable",
-    tablets: "Tablets",
+    inyectable: "Injectable",
+    pastillas: "Tablets",
+    oral: "Oral (liquid)",
+    custom: "Custom",
     tipoPIF: "Type of FIP:",
-    pesoGato: "Cat weight (kg):",
-    concentracion: "Concentration (mg):",
+    pesoGato: "Cat weight (lbs):",  // 👈 ahora muestra libras
+    concentracion: "Concentration:",
+    concentracionUnitsMl: "mg/ml",
+    concentracionUnitsTab: "mg per tablet",
     btnCalcular: "Calculate",
-    resultadoLabel: "Dosage:",
-    advertencia: "This calculator is only an estimate; always consult your veterinarian.",
-    // Registro
+    advertencia: "Calculator is only an estimate — always consult your veterinarian.",
+    subformaLabel: "Custom mode:",
+    customDosage: "Dosage (mg/kg):",
+    customConcentration: "Concentration:",
+    terms: {
+      wet: "Wet",
+      dry: "Dry",
+      ocular: "Ocular",
+      neuro: "Neurological"
+    },
+    ml: "ml",
+    tablets: "tablets",
+    historialTitle: "History",
     registroDia: "Day:",
-    registroPeso: "Cat weight (kg):",
-    registroDosis: "Daily dose (mg/ml):",
+    registroPeso: "Weight:",
+    registroDosis: "Dose:",
     registroComentarios: "Comments / Updates:",
     btnGuardar: "Save record",
-    historialTitle: "History",
-    // Acciones
     editar: "✏️ Edit",
-    eliminar: "🗑️ Delete",
+    borrar: "🗑️ Delete",
     guardar: "💾 Save",
-    cancelar: "✖️ Cancel",
-    // Unidades
-    unidadesMl: "ml",
-    unidadesTablets: "tablets",
-    // Tipos
-    pif: {
-      wet8: "Wet 8 mg/kg",
-      wet10: "Wet 10 mg/kg",
-      dry10: "Dry 10 mg/kg",
-      ocular10: "Ocular 10 mg/kg",
-      neuro12: "Neurological 12 mg/kg",
-      neuro13: "Neurological 13 mg/kg",
-      neuro14: "Neurological 14 mg/kg",
-      neuro15: "Neurological 15 mg/kg"
-    }
+    cancelar: "✖️ Cancel"
   }
 };
 
-// ===================== Tipos por forma =====================
-const PIF_TYPES = {
-  inyectable: [
-    { key: "wet8", dose: 8 },
-    { key: "wet10", dose: 10 },
-    { key: "dry10", dose: 10 },
-    { key: "ocular10", dose: 10 },
-    { key: "neuro12", dose: 12 },
-    { key: "neuro13", dose: 13 },
-    { key: "neuro14", dose: 14 },
-    { key: "neuro15", dose: 15 }
-  ],
-  pastillas: [
-    { key: "wet8", dose: 8 },
-    { key: "wet10", dose: 10 },
-    { key: "dry10", dose: 10 },
-    { key: "ocular10", dose: 10 },
-    { key: "neuro12", dose: 12 },
-    { key: "neuro15", dose: 15 }
-  ]
-};
+// ---------- Datos de tipos ----------
+const TYPES_INYECTABLE = [
+  { cat: "wet", dose: 8 },
+  { cat: "wet", dose: 9 },
+  { cat: "wet", dose: 10 },
+  { cat: "dry", dose: 10 },
+  { cat: "ocular", dose: 10 },
+  { cat: "neuro", dose: 12 },
+  { cat: "neuro", dose: 13 },
+  { cat: "neuro", dose: 14 },
+  { cat: "neuro", dose: 15 }
+];
 
-// ===================== Utilidades =====================
-const t = (key) => i18n[languageSelect.value][key];
+const TYPES_TABLETS_ORAL = [
+  { cat: "wet", dose: 8 },
+  { cat: "wet", dose: 10 },
+  { cat: "dry", dose: 10 },
+  { cat: "ocular", dose: 10 },
+  { cat: "neuro", dose: 12 },
+  { cat: "neuro", dose: 15 }
+];
 
-function translateStaticTexts() {
+// ---------- Utilidades ----------
+const t = (key) => i18n[languageSelect.value || "es"][key];
+
+function labelType(cat, dose) {
+  const lang = languageSelect.value || "es";
+  const name = i18n[lang].terms[cat] || cat;
+  return `${name} ${dose} mg/kg`;
+}
+
+function roundTabletsRule(n) {
+  const base = Math.floor(n);
+  const frac = n - base;
+  if (frac < 0.3) return base;
+  if (frac < 0.8) return base + 0.5;
+  return base + 1;
+}
+
+function setElementTextByTranslateAttr() {
   document.querySelectorAll("[data-translate]").forEach(el => {
     const key = el.getAttribute("data-translate");
-    const txt = i18n[languageSelect.value][key];
-    if (txt) el.textContent = txt;
+    if (i18n[languageSelect.value][key] !== undefined) {
+      el.textContent = i18n[languageSelect.value][key];
+    }
   });
 }
 
-function ceilToHalf(x) {
-  // redondear SIEMPRE hacia arriba al múltiplo 0.5
-  return Math.ceil((x - 1e-9) * 2) / 2;
+function clearChildren(node) {
+  while (node.firstChild) node.removeChild(node.firstChild);
 }
 
-// ===================== Poblar selects =====================
-function populateForma() {
-  const lang = languageSelect.value;
-  formaSelect.innerHTML = "";
-  const optIny = document.createElement("option");
-  optIny.value = "inyectable";
-  optIny.textContent = i18n[lang].injectable;
-
-  const optTab = document.createElement("option");
-  optTab.value = "pastillas";
-  optTab.textContent = i18n[lang].tablets;
-
-  formaSelect.appendChild(optIny);
-  formaSelect.appendChild(optTab);
+// Convertir input a kg según idioma
+function getPesoKg() {
+  let peso = parseFloat(inputPeso.value || "0");
+  if (languageSelect.value === "en") {
+    peso = peso * 0.45359237; // convertir de lbs a kg
+  }
+  return peso;
 }
 
-function populateTipos() {
-  const lang = languageSelect.value;
+// ---------- Render dinámico ----------
+function renderTipoOptions() {
+  clearChildren(tipoSelect);
   const forma = formaSelect.value;
-  tipoSelect.innerHTML = "";
-
-  // Mostrar/ocultar concentración según forma
-  concContainer.style.display = (forma === "pastillas") ? "block" : "none";
-
-  (PIF_TYPES[forma] || []).forEach(item => {
+  let list = [];
+  if (forma === "inyectable") list = TYPES_INYECTABLE;
+  else if (forma === "pastillas" || forma === "oral") list = TYPES_TABLETS_ORAL;
+  list.forEach(item => {
     const opt = document.createElement("option");
-    opt.value = item.dose;      // valor numérico de mg/kg
-    opt.dataset.key = item.key; // clave para traducir
-    opt.textContent = i18n[lang].pif[item.key];
+    opt.value = String(item.dose);
+    opt.textContent = labelType(item.cat, item.dose);
     tipoSelect.appendChild(opt);
   });
 }
 
-function refreshTipoLabels() {
-  const lang = languageSelect.value;
-  Array.from(tipoSelect.options).forEach(opt => {
-    const k = opt.dataset.key;
-    if (k && i18n[lang].pif[k]) {
-      opt.textContent = i18n[lang].pif[k];
-    }
-  });
+function renderConcentrationUI() {
+  clearChildren(concContainer);
+  const label = document.createElement("label");
+  label.setAttribute("data-translate", "concentracion");
+  label.textContent = t("concentracion");
+
+  const select = document.createElement("select");
+  select.id = "calc-concentracion";
+  const forma = formaSelect.value;
+
+  if (forma === "inyectable") {
+    const opt = document.createElement("option");
+    opt.value = "15";
+    opt.textContent = "15 mg/ml";
+    select.appendChild(opt);
+  } else if (forma === "pastillas") {
+    const opt15 = document.createElement("option");
+    opt15.value = "15"; opt15.textContent = "15 mg";
+    const opt30 = document.createElement("option");
+    opt30.value = "30"; opt30.textContent = "30 mg";
+    select.appendChild(opt15); select.appendChild(opt30);
+  } else if (forma === "oral") {
+    const opt = document.createElement("option");
+    opt.value = "50"; opt.textContent = "50 mg/ml";
+    select.appendChild(opt);
+  } else return;
+
+  concContainer.appendChild(label);
+  concContainer.appendChild(select);
 }
 
-// ===================== Cálculo =====================
-calcForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const peso = parseFloat(document.getElementById("calc-peso").value || "0");
-  if (!peso || peso <= 0) {
-    resultado.textContent = t("resultadoLabel") + " —";
-    return;
-  }
-
-  const dosisMgKg = parseFloat(tipoSelect.value);
-
-  if (formaSelect.value === "inyectable") {
-    // 15 mg/ml fijo
-    const ml = (peso * dosisMgKg) / 15;
-    resultado.innerHTML = `${t("resultadoLabel")} ${ml.toFixed(2)} ${t("unidadesMl")} <span class="calc-warning"> ${t("advertencia")}</span>`;
+function setTipoVisibility() {
+  tipoContainer.style.display = (formaSelect.value === "custom") ? "none" : "";
+}
+function setCustomVisibility() {
+  customFields.style.display = (formaSelect.value === "custom") ? "" : "none";
+}
+function renderAllForForma() {
+  setTipoVisibility();
+  setCustomVisibility();
+  if (formaSelect.value !== "custom") {
+    renderTipoOptions();
+    renderConcentrationUI();
   } else {
-    // Pastillas: usar mg efectivos por tableta según concentración
-    // 15 mg ⇒ 8 mg efectivos/tab; 30 mg ⇒ 16 mg efectivos/tab
-    const conc = parseFloat(concSelect.value || "15");
-    const mgEfectivos = (conc === 15) ? 8 : 16;
+    clearChildren(concContainer);
+  }
+}
 
-    const rawTabs = (peso * dosisMgKg) / mgEfectivos;
-    const tabs = ceilToHalf(rawTabs);
+// ---------- Cálculo ----------
+function calcular() {
+  const forma = formaSelect.value;
+  const peso = getPesoKg(); // siempre en kg
+  resultado.textContent = "";
 
-    resultado.innerHTML = `${t("resultadoLabel")} ${tabs} ${t("unidadesTablets")} <span class="calc-warning"> ${t("advertencia")}</span>`;
+  if (!peso || peso <= 0) {
+    resultado.textContent = "—"; return;
   }
 
-  // Mostrar anuncio (si corre dentro de Android)
-  try {
-    if (window.Android && typeof window.Android.showAd === "function") {
-      window.Android.showAd();
-    }
-  } catch (_) {}
-});
+  let dosisMgKg = 0, conc = 0;
 
-// ===================== Registro & Historial =====================
+  if (forma === "custom") {
+    const sub = customSubforma.value;
+    const d = parseFloat(customDosage.value || "0");
+    const c = parseFloat(customConcentration.value || "0");
+    if (!d || !c) { resultado.textContent = "—"; return; }
+    if (sub === "inyectable" || sub === "oral") {
+      const ml = (peso * d) / c;
+      resultado.textContent = `${ml.toFixed(2)} ${t("ml")} — ${t("advertencia")}`;
+    } else {
+      const raw = (peso * d) / c * 2;
+      const tabs = roundTabletsRule(raw);
+      resultado.textContent = `${tabs} ${t("tablets")} — ${t("advertencia")}`;
+    }
+  } else if (forma === "inyectable") {
+    dosisMgKg = parseFloat(tipoSelect.value || "0");
+    conc = 15;
+    const ml = (peso * dosisMgKg) / conc;
+    resultado.textContent = `${ml.toFixed(2)} ${t("ml")} — ${t("advertencia")}`;
+  } else if (forma === "pastillas") {
+    dosisMgKg = parseFloat(tipoSelect.value || "0");
+    const concSel = document.getElementById("calc-concentracion");
+    conc = parseFloat(concSel ? concSel.value : "15");
+    const raw = (peso * dosisMgKg) / conc * 2;
+    const tabs = roundTabletsRule(raw);
+    resultado.textContent = `${tabs} ${t("tablets")} — ${t("advertencia")}`;
+  } else if (forma === "oral") {
+    dosisMgKg = parseFloat(tipoSelect.value || "0");
+    conc = 50;
+    const ml = (peso * dosisMgKg) / conc;
+    resultado.textContent = `${ml.toFixed(2)} ${t("ml")} — ${t("advertencia")}`;
+  }
+}
+
+// ---------- Registro / Historial ----------
 function loadHistorial() {
   const data = JSON.parse(localStorage.getItem("pif_historial") || "[]");
-  historialDiv.innerHTML = "";
+  historialList.innerHTML = "";
   data.forEach((item, idx) => {
-    const row = document.createElement("div");
-    row.className = "historial-item";
-
-    const left = document.createElement("div");
-    left.innerHTML = `
-      <div><strong>${item.fecha}</strong></div>
-      <div>${i18n[languageSelect.value].registroPeso} ${item.peso} kg</div>
-      <div>${i18n[languageSelect.value].registroDosis} ${item.dosis}</div>
-      <div>${i18n[languageSelect.value].registroComentarios} ${item.comentarios || "-"}</div>
+    const li = document.createElement("div");
+    li.classList.add("historial-item");
+    li.innerHTML = `
+      <div><strong>${item.fecha || "-"}</strong></div>
+      <div>${t("registroPeso")} ${item.peso ?? "-"} kg</div>
+      <div>${t("registroDosis")} ${item.dosis ?? "-"}</div>
+      <div>${t("registroComentarios")} ${item.comentarios || "-"}</div>
+      <div class="historial-btns">
+        <button class="edit">${t("editar")}</button>
+        <button class="delete">${t("borrar")}</button>
+      </div>
     `;
-
-    const btns = document.createElement("div");
-    btns.className = "historial-btns";
-
-    const bEdit = document.createElement("button");
-    bEdit.className = "edit";
-    bEdit.textContent = i18n[languageSelect.value].editar;
-
-    const bDel = document.createElement("button");
-    bDel.className = "delete";
-    bDel.textContent = i18n[languageSelect.value].eliminar;
-
-    bEdit.addEventListener("click", () => startEdit(idx));
-    bDel.addEventListener("click", () => deleteItem(idx));
-
-    btns.appendChild(bEdit);
-    btns.appendChild(bDel);
-
-    row.appendChild(left);
-    row.appendChild(btns);
-    historialDiv.appendChild(row);
+    li.querySelector(".edit").addEventListener("click", () => {
+      li.innerHTML = `
+        <div><input type="date" id="e_fecha" value="${item.fecha || ""}"></div>
+        <div><input type="number" step="0.1" id="e_peso" value="${item.peso ?? ""}"></div>
+        <div><input type="text" id="e_dosis" value="${item.dosis ?? ""}"></div>
+        <div><textarea id="e_comentarios" rows="2">${item.comentarios || ""}</textarea></div>
+        <div class="historial-btns">
+          <button class="save">${t("guardar")}</button>
+          <button class="cancel">${t("cancelar")}</button>
+        </div>
+      `;
+      li.querySelector(".save").addEventListener("click", () => {
+        item.fecha = document.getElementById("e_fecha").value;
+        item.peso = parseFloat(document.getElementById("e_peso").value || "0");
+        item.dosis = document.getElementById("e_dosis").value || "";
+        item.comentarios = document.getElementById("e_comentarios").value || "";
+        data[idx] = item;
+        localStorage.setItem("pif_historial", JSON.stringify(data));
+        loadHistorial();
+      });
+      li.querySelector(".cancel").addEventListener("click", loadHistorial);
+    });
+    li.querySelector(".delete").addEventListener("click", () => {
+      data.splice(idx, 1);
+      localStorage.setItem("pif_historial", JSON.stringify(data));
+      loadHistorial();
+    });
+    historialList.appendChild(li);
   });
-}
-
-function startEdit(index) {
-  const data = JSON.parse(localStorage.getItem("pif_historial") || "[]");
-  const item = data[index];
-  if (!item) return;
-
-  const rows = historialDiv.querySelectorAll(".historial-item");
-  const row = rows[index];
-  row.innerHTML = "";
-
-  const left = document.createElement("div");
-  left.style.flex = "1";
-  left.innerHTML = `
-    <div><input type="date" id="e_fecha" value="${item.fecha}"></div>
-    <div><input type="number" step="0.01" id="e_peso" value="${item.peso}"></div>
-    <div><input type="number" step="0.01" id="e_dosis" value="${item.dosis}"></div>
-    <div><textarea id="e_comentarios" rows="2">${item.comentarios || ""}</textarea></div>
-  `;
-
-  const btns = document.createElement("div");
-  btns.className = "historial-btns";
-
-  const bSave = document.createElement("button");
-  bSave.className = "edit";
-  bSave.textContent = i18n[languageSelect.value].guardar;
-
-  const bCancel = document.createElement("button");
-  bCancel.className = "delete";
-  bCancel.textContent = i18n[languageSelect.value].cancelar;
-
-  bSave.addEventListener("click", () => {
-    item.fecha = document.getElementById("e_fecha").value;
-    item.peso = parseFloat(document.getElementById("e_peso").value || "0");
-    item.dosis = parseFloat(document.getElementById("e_dosis").value || "0");
-    item.comentarios = document.getElementById("e_comentarios").value || "";
-    data[index] = item;
-    localStorage.setItem("pif_historial", JSON.stringify(data));
-    loadHistorial();
-  });
-
-  bCancel.addEventListener("click", loadHistorial);
-
-  btns.appendChild(bSave);
-  btns.appendChild(bCancel);
-
-  row.appendChild(left);
-  row.appendChild(btns);
-}
-
-function deleteItem(index) {
-  const data = JSON.parse(localStorage.getItem("pif_historial") || "[]");
-  data.splice(index, 1);
-  localStorage.setItem("pif_historial", JSON.stringify(data));
-  loadHistorial();
 }
 
 if (registroForm) {
   registroForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const item = {
-      fecha: document.getElementById("fecha").value,
-      peso: parseFloat(document.getElementById("peso").value || "0"),
-      dosis: parseFloat(document.getElementById("dosis").value || "0"),
-      comentarios: document.getElementById("comentarios").value || ""
+      fecha: regDia.value,
+      peso: parseFloat(regPeso.value || "0"),
+      dosis: regDosis.value || "",
+      comentarios: regComentarios.value || ""
     };
     const data = JSON.parse(localStorage.getItem("pif_historial") || "[]");
     data.unshift(item);
     localStorage.setItem("pif_historial", JSON.stringify(data));
     registroForm.reset();
     loadHistorial();
-
-    // Anuncio al guardar (Android)
-    try {
-      if (window.Android && typeof window.Android.showAd === "function") {
-        window.Android.showAd();
-      }
-    } catch (_) {}
   });
 }
 
-// ===================== Idioma y arranque =====================
+// ---------- Traducción dinámica ----------
 function applyTranslations() {
-  translateStaticTexts();
-  populateForma();     // inyecta etiquetas traducidas
-  populateTipos();     // inyecta tipos traducidos
-  refreshTipoLabels(); // por si ya existían
-  loadHistorial();     // refresca textos en historial
+  setElementTextByTranslateAttr();
+  if (formaSelect.value !== "custom") renderTipoOptions();
+  if (customSubforma) {
+    Array.from(customSubforma.options).forEach(opt => {
+      const k = opt.getAttribute("data-translate");
+      if (k && i18n[languageSelect.value][k]) {
+        opt.textContent = i18n[languageSelect.value][k];
+      }
+    });
+  }
+  loadHistorial();
 }
 
-languageSelect.addEventListener("change", applyTranslations);
-formaSelect.addEventListener("change", populateTipos);
+// ---------- Eventos ----------
+if (calcForm) {
+  calcForm.addEventListener("submit", e => { e.preventDefault(); calcular(); });
+}
+if (formaSelect) formaSelect.addEventListener("change", renderAllForForma);
+if (customSubforma) {
+  customSubforma.addEventListener("change", () => {
+    const lang = languageSelect.value;
+    const isTabs = customSubforma.value === "pastillas";
+    const concLabel = document.getElementById("label-concentration");
+    if (concLabel) {
+      concLabel.textContent = i18n[lang].customConcentration + " " +
+        (isTabs ? `(${i18n[lang].concentracionUnitsTab})` : `(${i18n[lang].concentracionUnitsMl})`);
+    }
+  });
+}
+if (languageSelect) {
+  languageSelect.addEventListener("change", () => {
+    applyTranslations();
+    if (formaSelect.value !== "custom") renderConcentrationUI();
+  });
+}
 
+// ---------- Init ----------
 window.addEventListener("DOMContentLoaded", () => {
-  // por defecto ES + inyectable
-  languageSelect.value = "es";
+  if (!languageSelect.value) languageSelect.value = "es";
   applyTranslations();
-  formaSelect.value = "inyectable";
-  populateTipos(); // asegura que aparezcan las opciones desde el inicio
+  if (formaSelect) formaSelect.value = "inyectable";
+  renderAllForForma();
+  loadHistorial();
 });
-
 
 
