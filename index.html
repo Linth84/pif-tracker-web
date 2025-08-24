@@ -5,95 +5,136 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PIF/FIP Tracker</title>
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Favicon en la raíz -->
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
-  <div id="app">
-    <header>
-      <h1 data-translate="calcTitle"></h1>
-      <select id="languageSelect">
-        <option value="es">Español</option>
-        <option value="en">English</option>
-      </select>
-    </header>
+<div id="app">
+  <header>
+    <h1 data-translate="calcTitle"></h1>
+    <select id="languageSelect">
+      <option value="es">Español</option>
+      <option value="en">English</option>
+    </select>
+  </header>
 
-    <!-- Calculadora -->
-    <section id="calc-section">
-      <h2 data-translate="formAdmin"></h2>
-      <form id="calc-form">
-        <label for="calc-forma" data-translate="formAdmin"></label>
-        <select id="calc-forma">
+  <!-- NAV TABS -->
+  <nav id="tabs">
+    <button class="tab-btn" data-tab="calc" data-translate="tabCalc">Calculadora</button>
+    <button class="tab-btn" data-tab="registro" data-translate="tabRegistro">Registro</button>
+    <button class="tab-btn" data-tab="seguimiento" data-translate="tabSeguimiento">Seguimiento</button>
+  </nav>
+
+  <!-- ==================== CALCULADORA ==================== -->
+  <section id="calc-section">
+    <h2 data-translate="formAdmin"></h2>
+
+    <form id="calc-form">
+      <label for="calc-forma" data-translate="formAdmin"></label>
+      <select id="calc-forma">
+        <option value="inyectable" data-translate="inyectable"></option>
+        <option value="pastillas"   data-translate="pastillas"></option>
+        <option value="oral"        data-translate="oral"></option>
+        <option value="custom"      data-translate="custom"></option>
+      </select>
+
+      <!-- Tipo de PIF -->
+      <div id="tipo-container">
+        <label for="calc-tipo" data-translate="tipoPIF"></label>
+        <select id="calc-tipo"></select>
+      </div>
+
+      <!-- Concentración -->
+      <div id="concentracion-container"></div>
+
+      <!-- Custom -->
+      <div id="custom-fields" style="display:none;">
+        <label data-translate="subformaLabel"></label>
+        <select id="custom-subforma">
           <option value="inyectable" data-translate="inyectable"></option>
-          <option value="pastillas" data-translate="pastillas"></option>
-          <option value="oral" data-translate="oral"></option>
-          <option value="custom" data-translate="custom"></option>
+          <option value="pastillas"  data-translate="pastillas"></option>
+          <option value="oral"       data-translate="oral"></option>
         </select>
 
-        <!-- Tipo de PIF -->
-        <div id="tipo-container">
-          <label for="calc-tipo" data-translate="tipoPIF"></label>
-          <select id="calc-tipo"></select>
-        </div>
+        <label id="label-concentration" data-translate="customConcentration"></label>
+        <input type="number" id="custom-concentration" step="0.1" />
 
-        <!-- Concentración -->
-        <div id="concentracion-container"></div>
+        <label data-translate="customDosage"></label>
+        <input type="number" id="custom-dosage" step="0.1" />
+      </div>
 
-        <!-- Custom -->
-        <div id="custom-fields" style="display:none;">
-          <label data-translate="subformaLabel"></label>
-          <select id="custom-subforma">
-            <option value="inyectable" data-translate="inyectable"></option>
-            <option value="pastillas" data-translate="pastillas"></option>
-            <option value="oral" data-translate="oral"></option>
-          </select>
+      <!-- Peso -->
+      <label for="calc-peso" data-translate="pesoGato"></label>
+      <input type="number" id="calc-peso" step="0.1"/>
 
-          <label data-translate="customDosage"></label>
-          <input type="number" id="custom-dosage" step="0.1" />
+      <button id="btn-calcular" type="submit" data-translate="btnCalcular"></button>
+    </form>
 
-          <label id="label-concentration" data-translate="customConcentration"></label>
-          <input type="number" id="custom-concentration" step="0.1" />
-        </div>
+    <div id="calc-resultado"></div>
+    <span class="advertencia" data-translate="advertencia"></span>
+  </section>
 
-        <!-- Peso -->
-        <label for="calc-peso" data-translate="pesoGato"></label>
-        <input type="number" id="calc-peso" step="0.1"/>
+  <!-- ==================== REGISTRO ==================== -->
+  <section id="registro-section" style="display:none;">
+    <h2 data-translate="historialTitle"></h2>
 
-        <button id="btn-calcular" type="submit" data-translate="btnCalcular"></button>
-      </form>
-      <div id="calc-resultado"></div>
-      <span class="advertencia" data-translate="advertencia"></span>
-    </section>
+    <form id="registro-form">
+      <label for="registro-dia" data-translate="registroDia"></label>
+      <input type="date" id="registro-dia" />
 
-    <!-- Registro -->
-    <section id="registro-section">
-      <h2 data-translate="historialTitle"></h2>
-      <form id="registro-form">
-        <label for="registro-dia" data-translate="registroDia"></label>
-        <input type="date" id="registro-dia" />
+      <label for="registro-peso" data-translate="registroPeso"></label>
+      <input type="number" id="registro-peso" step="0.1"/>
 
-        <label for="registro-peso" data-translate="registroPeso"></label>
-        <input type="number" id="registro-peso" step="0.1"/>
+      <label for="registro-dosis" data-translate="registroDosis"></label>
+      <input type="text" id="registro-dosis" />
 
-        <label for="registro-dosis" data-translate="registroDosis"></label>
-        <input type="text" id="registro-dosis" />
+      <label for="registro-comentarios" data-translate="registroComentarios"></label>
+      <textarea id="registro-comentarios" rows="2"></textarea>
 
-        <label for="registro-comentarios" data-translate="registroComentarios"></label>
-        <textarea id="registro-comentarios" rows="2"></textarea>
+      <button id="btn-guardar" type="submit" data-translate="btnGuardar"></button>
+    </form>
 
-        <button id="btn-guardar" type="submit" data-translate="btnGuardar"></button>
-      </form>
+    <div id="historial"></div>
+  </section>
 
-      <div id="historial"></div>
-    </section>
-  </div>
-  <script src="script.js"></script>
+  <!-- ==================== SEGUIMIENTO ==================== -->
+  <section id="seguimiento-section" style="display:none;">
+    <h2 data-translate="seguimientoTitle">Seguimiento</h2>
+
+    <div class="seg-row">
+      <div>
+        <label>Inicio tratamiento</label>
+        <input type="date" id="treat-start" />
+      </div>
+      <div>
+        <label>Inicio observación</label>
+        <input type="date" id="obs-start" />
+      </div>
+    </div>
+
+    <div class="seg-stats">
+      <div><strong data-translate="treat">Tratamiento</strong>/<strong data-translate="obs">Observación</strong> → <span id="phase-now">—</span></div>
+      <div><strong>Día de la fase</strong>: <span id="day-in-phase">—</span> / 84</div>
+      <div><strong>Día total</strong>: <span id="day-global">—</span> / 168</div>
+    </div>
+
+    <div class="seg-progress">
+      <div class="seg-bar"><div id="progress-fill" style="width:0%"></div></div>
+      <small id="progress-label">0%</small>
+    </div>
+
+    <div class="seg-actions">
+      <button id="mark-today"    data-translate="markToday">Marcar dosis de hoy ✔</button>
+      <button id="add-note-today" data-translate="addNote">Agregar nota</button>
+      <button id="gen-days"       data-translate="regenList">Regenerar lista</button>
+    </div>
+
+    <div id="seguimiento-list" class="seg-list"></div>
+  </section>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
-
-
-
 
 
 
