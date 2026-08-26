@@ -1,153 +1,1015 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+  <!-- ======================================================
+       ÍNDICE DEL <HEAD>
+
+       01. CONFIGURACIÓN GENERAL
+       02. SEO BÁSICO
+       03. FAVICON
+       04. OPEN GRAPH
+       05. X / TWITTER CARD
+       06. ESTILOS
+       ====================================================== -->
+
+
+  <!-- ======================================================
+       01. CONFIGURACIÓN GENERAL
+       Define codificación, responsive y color del navegador.
+       ====================================================== -->
+
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <meta name="theme-color" content="#f5f6fa" id="theme-color-meta" />
-  <title>PIF/FIP Tracker</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
+
+  <!--
+    Este meta puede ser actualizado desde script.js
+    cuando se cambia entre modo claro y oscuro.
+  -->
+  <meta
+    name="theme-color"
+    content="#f5f6fa"
+    id="theme-color-meta"
+  />
+
+
+  <!-- ======================================================
+       02. SEO BÁSICO
+
+       Título y descripción que pueden usar Google
+       y otros buscadores.
+       ====================================================== -->
+
+  <title>
+    PIF Tracker — Seguimiento del tratamiento contra el PIF
+  </title>
+
+  <meta
+    name="description"
+    content="PIF Tracker ayuda a calcular dosis, registrar el tratamiento y realizar el seguimiento de los 84 días de tratamiento y 84 días de observación."
+  />
+
+  <!--
+    URL oficial de esta página.
+
+    Evita que los buscadores interpreten distintas variantes
+    de la URL como páginas diferentes.
+  -->
+  <link
+    rel="canonical"
+    href="https://edgardovillalba.is-a.dev/pif-tracker-web/"
+  />
+
+
+  <!-- ======================================================
+       03. FAVICON
+
+       Icono pequeño que aparece en:
+       - pestaña del navegador
+       - favoritos
+       - accesos directos
+       ====================================================== -->
+
+  <link
+    rel="icon"
+    type="image/x-icon"
+    href="./favicon.ico"
+  />
+
+
+  <!-- ======================================================
+       04. OPEN GRAPH
+
+       Utilizado principalmente cuando compartís el link en:
+       - Discord
+       - WhatsApp
+       - LinkedIn
+       - Facebook
+       - Telegram
+       - otras plataformas compatibles
+
+       La imagen actual mide:
+       1536 × 1024 px
+       ====================================================== -->
+
+  <!-- Tipo de contenido -->
+  <meta
+    property="og:type"
+    content="website"
+  />
+
+  <!-- URL pública de PIF Tracker -->
+  <meta
+    property="og:url"
+    content="https://edgardovillalba.is-a.dev/pif-tracker-web/"
+  />
+
+  <!-- Nombre del sitio -->
+  <meta
+    property="og:site_name"
+    content="PIF Tracker"
+  />
+
+  <!-- Título que aparece en la tarjeta -->
+  <meta
+    property="og:title"
+    content="PIF Tracker — Tu compañero en la lucha contra el PIF"
+  />
+
+  <!-- Descripción que aparece debajo del título -->
+  <meta
+    property="og:description"
+    content="Calcula dosis, registra el tratamiento y acompaña los 84 días de tratamiento + 84 días de observación."
+  />
+
+  <!--
+    Imagen de la social card.
+
+    El archivo pif-tracker-card.png debe estar
+    en la raíz del repositorio, junto a index.html.
+  -->
+  <meta
+    property="og:image"
+    content="https://edgardovillalba.is-a.dev/pif-tracker-web/pif-tracker-card.png"
+  />
+
+  <!-- Dimensiones REALES de la card actual -->
+  <meta
+    property="og:image:width"
+    content="1536"
+  />
+
+  <meta
+    property="og:image:height"
+    content="1024"
+  />
+
+  <!-- Tipo del archivo -->
+  <meta
+    property="og:image:type"
+    content="image/png"
+  />
+
+  <!-- Texto alternativo de la imagen -->
+  <meta
+    property="og:image:alt"
+    content="PIF Tracker — aplicación para el seguimiento del tratamiento contra el PIF"
+  />
+
+  <!-- Idioma / región principal -->
+  <meta
+    property="og:locale"
+    content="es_AR"
+  />
+
+
+  <!-- ======================================================
+       05. X / TWITTER CARD
+
+       Hace que X / Twitter muestre una tarjeta
+       grande con la misma imagen.
+       ====================================================== -->
+
+  <!-- Tarjeta con imagen grande -->
+  <meta
+    name="twitter:card"
+    content="summary_large_image"
+  />
+
+  <meta
+    name="twitter:title"
+    content="PIF Tracker — Tu compañero en la lucha contra el PIF"
+  />
+
+  <meta
+    name="twitter:description"
+    content="Calcula dosis, registra el tratamiento y acompaña los 84 días de tratamiento + 84 días de observación."
+  />
+
+  <meta
+    name="twitter:image"
+    content="https://edgardovillalba.is-a.dev/pif-tracker-web/pif-tracker-card.png"
+  />
+
+  <meta
+    name="twitter:image:alt"
+    content="PIF Tracker — aplicación para el seguimiento del tratamiento contra el PIF"
+  />
+
+
+  <!-- ======================================================
+       06. ESTILOS
+
+       Archivo CSS principal de PIF Tracker.
+       ====================================================== -->
+
+  <link
+    rel="stylesheet"
+    href="./style.css"
+  />
 </head>
+
+
 <body>
-<div id="app">
-  <header class="app-header">
-    <div class="brand">
-      <div class="brand-mark" aria-hidden="true">
-        <span class="paw-dot paw-dot-1"></span><span class="paw-dot paw-dot-2"></span><span class="paw-dot paw-dot-3"></span><span class="paw-dot paw-dot-4"></span><span class="paw-pad"></span>
-      </div>
-      <div class="brand-copy">
-        <span class="brand-kicker">PIF · FIP</span>
-        <h1 data-translate="calcTitle">PIF Tracker</h1>
-      </div>
-    </div>
-    <div class="header-controls">
-      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Cambiar tema" title="Cambiar tema">
-        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="3.5"></circle>
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path>
-        </svg>
-        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M20.3 15.2A8.4 8.4 0 0 1 8.8 3.7a8.4 8.4 0 1 0 11.5 11.5Z"></path>
-        </svg>
-      </button>
-      <label class="language-control" aria-label="Language">
-            <select id="languageSelect">
-          <option value="es">ES</option>
-          <option value="en">EN</option>
-        </select>
-      </label>
-    </div>
-  </header>
 
-  <nav id="tabs" aria-label="Principal">
-    <button class="tab-btn" data-tab="calc" data-translate="tabCalc">Calculadora</button>
-    <button class="tab-btn" data-tab="registro" data-translate="tabRegistro">Registro</button>
-    <button class="tab-btn" data-tab="seguimiento" data-translate="tabSeguimiento">Seguimiento</button>
-  </nav>
+  <!-- ======================================================
+       ÍNDICE DEL <BODY>
 
-  <main>
-    <section id="calc-section" class="screen-section">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">PIF Tracker</span>
-          <h2 data-translate="formAdmin">Forma de administración:</h2>
+       01. APP
+       02. HEADER
+       03. NAVEGACIÓN
+       04. CALCULADORA
+       05. REGISTRO
+       06. SEGUIMIENTO 84 + 84
+       07. JAVASCRIPT
+       ====================================================== -->
+
+
+  <!-- ======================================================
+       01. APP
+
+       Contenedor principal de toda la aplicación.
+       ====================================================== -->
+
+  <div id="app">
+
+
+    <!-- ====================================================
+         02. HEADER
+
+         Incluye:
+         - marca PIF Tracker
+         - botón light/dark
+         - selector ES / EN
+         ==================================================== -->
+
+    <header class="app-header">
+
+      <!-- Marca -->
+      <div class="brand">
+
+        <!--
+          Isotipo de patita construido con CSS.
+        -->
+        <div
+          class="brand-mark"
+          aria-hidden="true"
+        >
+          <span class="paw-dot paw-dot-1"></span>
+          <span class="paw-dot paw-dot-2"></span>
+          <span class="paw-dot paw-dot-3"></span>
+          <span class="paw-dot paw-dot-4"></span>
+          <span class="paw-pad"></span>
+        </div>
+
+        <div class="brand-copy">
+          <span class="brand-kicker">
+            PIF · FIP
+          </span>
+
+          <h1 data-translate="calcTitle">
+            PIF Tracker
+          </h1>
         </div>
       </div>
 
-      <div class="content-card calculator-card">
-        <form id="calc-form">
-          <div class="field-group">
-            <label for="calc-forma" data-translate="formAdmin"></label>
-            <select id="calc-forma">
-              <option value="inyectable" data-translate="inyectable"></option>
-              <option value="pastillas" data-translate="pastillas"></option>
-              <option value="oral" data-translate="oral"></option>
-              <option value="custom" data-translate="custom"></option>
-            </select>
+
+      <!-- Controles del header -->
+      <div class="header-controls">
+
+        <!-- ================================================
+             BOTÓN DE TEMA
+             Cambia entre light / dark.
+             ================================================ -->
+
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          type="button"
+          aria-label="Cambiar tema"
+          title="Cambiar tema"
+        >
+
+          <!-- Icono sol -->
+          <svg
+            class="icon-sun"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="3.5"
+            ></circle>
+
+            <path
+              d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"
+            ></path>
+          </svg>
+
+
+          <!-- Icono luna -->
+          <svg
+            class="icon-moon"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              d="M20.3 15.2A8.4 8.4 0 0 1 8.8 3.7a8.4 8.4 0 1 0 11.5 11.5Z"
+            ></path>
+          </svg>
+        </button>
+
+
+        <!-- ================================================
+             SELECTOR DE IDIOMA
+             Permite cambiar entre español e inglés.
+             ================================================ -->
+
+        <label
+          class="language-control"
+          aria-label="Idioma"
+        >
+          <select id="languageSelect">
+            <option value="es">
+              ES
+            </option>
+
+            <option value="en">
+              EN
+            </option>
+          </select>
+        </label>
+
+      </div>
+    </header>
+
+
+    <!-- ====================================================
+         03. NAVEGACIÓN PRINCIPAL
+
+         Cambia entre:
+         - Calculadora
+         - Registro
+         - Seguimiento
+         ==================================================== -->
+
+    <nav
+      id="tabs"
+      aria-label="Navegación principal"
+    >
+
+      <button
+        class="tab-btn"
+        data-tab="calc"
+        data-translate="tabCalc"
+      >
+        Calculadora
+      </button>
+
+      <button
+        class="tab-btn"
+        data-tab="registro"
+        data-translate="tabRegistro"
+      >
+        Registro
+      </button>
+
+      <button
+        class="tab-btn"
+        data-tab="seguimiento"
+        data-translate="tabSeguimiento"
+      >
+        Seguimiento
+      </button>
+
+    </nav>
+
+
+    <!-- ====================================================
+         CONTENIDO PRINCIPAL
+         ==================================================== -->
+
+    <main>
+
+
+      <!-- ==================================================
+           04. CALCULADORA
+
+           Calcula la dosis según:
+           - forma de administración
+           - tipo de PIF
+           - concentración
+           - peso del gato
+           ================================================== -->
+
+      <section
+        id="calc-section"
+        class="screen-section"
+      >
+
+        <!-- Título -->
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">
+              PIF Tracker
+            </span>
+
+            <h2 data-translate="formAdmin">
+              Forma de administración:
+            </h2>
           </div>
+        </div>
 
-          <div id="tipo-container" class="field-group">
-            <label for="calc-tipo" data-translate="tipoPIF"></label>
-            <select id="calc-tipo"></select>
-          </div>
 
-          <div id="concentracion-container" class="field-group"></div>
+        <!-- Card de calculadora -->
+        <div class="content-card calculator-card">
 
-          <div id="custom-fields" class="custom-panel" style="display:none;">
+          <form id="calc-form">
+
+
+            <!-- Forma de administración -->
             <div class="field-group">
-              <label data-translate="subformaLabel"></label>
-              <select id="custom-subforma">
-                <option value="inyectable" data-translate="inyectable"></option>
-                <option value="pastillas" data-translate="pastillas"></option>
-                <option value="oral" data-translate="oral"></option>
+
+              <label
+                for="calc-forma"
+                data-translate="formAdmin"
+              ></label>
+
+              <select id="calc-forma">
+
+                <option
+                  value="inyectable"
+                  data-translate="inyectable"
+                ></option>
+
+                <option
+                  value="pastillas"
+                  data-translate="pastillas"
+                ></option>
+
+                <option
+                  value="oral"
+                  data-translate="oral"
+                ></option>
+
+                <option
+                  value="custom"
+                  data-translate="custom"
+                ></option>
+
               </select>
             </div>
-            <div class="field-group">
-              <label id="label-concentration" data-translate="customConcentration"></label>
-              <input type="number" id="custom-concentration" step="0.1" inputmode="decimal" />
+
+
+            <!-- Tipo de PIF -->
+            <div
+              id="tipo-container"
+              class="field-group"
+            >
+
+              <label
+                for="calc-tipo"
+                data-translate="tipoPIF"
+              ></label>
+
+              <select id="calc-tipo"></select>
+
             </div>
-            <div class="field-group">
-              <label data-translate="customDosage"></label>
-              <input type="number" id="custom-dosage" step="0.1" inputmode="decimal" />
+
+
+            <!--
+              Concentración.
+
+              El contenido se genera desde script.js
+              según la opción seleccionada.
+            -->
+            <div
+              id="concentracion-container"
+              class="field-group"
+            ></div>
+
+
+            <!-- ============================================
+                 CAMPOS PERSONALIZADOS
+
+                 Se muestran solamente cuando el usuario
+                 selecciona el modo Custom / Personalizado.
+                 ============================================ -->
+
+            <div
+              id="custom-fields"
+              class="custom-panel"
+              style="display: none;"
+            >
+
+              <div class="field-group">
+
+                <label
+                  data-translate="subformaLabel"
+                ></label>
+
+                <select id="custom-subforma">
+
+                  <option
+                    value="inyectable"
+                    data-translate="inyectable"
+                  ></option>
+
+                  <option
+                    value="pastillas"
+                    data-translate="pastillas"
+                  ></option>
+
+                  <option
+                    value="oral"
+                    data-translate="oral"
+                  ></option>
+
+                </select>
+              </div>
+
+
+              <div class="field-group">
+
+                <label
+                  id="label-concentration"
+                  data-translate="customConcentration"
+                ></label>
+
+                <input
+                  type="number"
+                  id="custom-concentration"
+                  step="0.1"
+                  inputmode="decimal"
+                />
+
+              </div>
+
+
+              <div class="field-group">
+
+                <label
+                  data-translate="customDosage"
+                ></label>
+
+                <input
+                  type="number"
+                  id="custom-dosage"
+                  step="0.1"
+                  inputmode="decimal"
+                />
+
+              </div>
+
             </div>
+
+
+            <!-- Peso -->
+            <div class="field-group weight-field">
+
+              <label
+                for="calc-peso"
+                data-translate="pesoGato"
+              ></label>
+
+              <div class="input-with-unit">
+
+                <input
+                  type="number"
+                  id="calc-peso"
+                  step="0.1"
+                  inputmode="decimal"
+                />
+
+                <span>
+                  kg
+                </span>
+
+              </div>
+            </div>
+
+
+            <!-- Botón calcular -->
+            <button
+              id="btn-calcular"
+              class="primary-action"
+              type="submit"
+              data-translate="btnCalcular"
+            ></button>
+
+          </form>
+        </div>
+
+
+        <!-- Resultado -->
+        <div
+          id="calc-resultado"
+          class="result-card"
+          aria-live="polite"
+        ></div>
+
+
+        <!-- Advertencia veterinaria -->
+        <div class="warning-card">
+
+          <span
+            class="warning-icon"
+            aria-hidden="true"
+          >
+            i
+          </span>
+
+          <span
+            class="advertencia"
+            data-translate="advertencia"
+          ></span>
+
+        </div>
+
+      </section>
+
+
+      <!-- ==================================================
+           05. REGISTRO
+
+           Permite guardar:
+           - fecha
+           - peso
+           - dosis
+           - comentarios
+
+           Los datos quedan guardados en localStorage.
+           ================================================== -->
+
+      <section
+        id="registro-section"
+        class="screen-section"
+        style="display: none;"
+      >
+
+        <!-- Título -->
+        <div class="section-heading">
+
+          <div>
+
+            <span class="eyebrow">
+              PIF Tracker
+            </span>
+
+            <h2
+              data-translate="historialTitle"
+            ></h2>
+
           </div>
 
-          <div class="field-group weight-field">
-            <label for="calc-peso" data-translate="pesoGato"></label>
-            <div class="input-with-unit">
-              <input type="number" id="calc-peso" step="0.1" inputmode="decimal" />
-              <span>kg</span>
-            </div>
+          <div
+            class="section-icon"
+            aria-hidden="true"
+          >
+            ✎
           </div>
 
-          <button id="btn-calcular" class="primary-action" type="submit" data-translate="btnCalcular"></button>
-        </form>
-      </div>
-
-      <div id="calc-resultado" class="result-card" aria-live="polite"></div>
-      <div class="warning-card">
-        <span class="warning-icon" aria-hidden="true">i</span>
-        <span class="advertencia" data-translate="advertencia"></span>
-      </div>
-    </section>
-
-    <section id="registro-section" class="screen-section" style="display:none;">
-      <div class="section-heading"><div><span class="eyebrow">PIF Tracker</span><h2 data-translate="historialTitle"></h2></div><div class="section-icon" aria-hidden="true">✎</div></div>
-      <div class="content-card">
-        <form id="registro-form">
-          <div class="field-group"><label for="registro-dia" data-translate="registroDia"></label><input type="date" id="registro-dia" /></div>
-          <div class="field-group"><label for="registro-peso" data-translate="registroPeso"></label><input type="number" id="registro-peso" step="0.1" inputmode="decimal"/></div>
-          <div class="field-group"><label for="registro-dosis" data-translate="registroDosis"></label><input type="text" id="registro-dosis" /></div>
-          <div class="field-group"><label for="registro-comentarios" data-translate="registroComentarios"></label><textarea id="registro-comentarios" rows="3"></textarea></div>
-          <button id="btn-guardar" class="primary-action" type="submit" data-translate="btnGuardar"></button>
-        </form>
-      </div>
-      <div id="historial"></div>
-    </section>
-
-    <section id="seguimiento-section" class="screen-section" style="display:none;">
-      <div class="section-heading"><div><span class="eyebrow">84 + 84</span><h2 data-translate="seguimientoTitle">Seguimiento</h2></div><div class="section-icon" aria-hidden="true">✓</div></div>
-      <div class="content-card tracking-card">
-        <div class="seg-row">
-          <div class="field-group"><label>Inicio tratamiento</label><input type="date" id="treat-start" /></div>
-          <div class="field-group"><label>Inicio observación</label><input type="date" id="obs-start" /></div>
         </div>
-        <div class="seg-stats">
-          <div><span data-translate="treat">Tratamiento</span> / <span data-translate="obs">Observación</span><strong id="phase-now">—</strong></div>
-          <div><span>Día de la fase</span><strong><span id="day-in-phase">—</span> / 84</strong></div>
-          <div><span>Día total</span><strong><span id="day-global">—</span> / 168</strong></div>
+
+
+        <!-- Formulario -->
+        <div class="content-card">
+
+          <form id="registro-form">
+
+
+            <!-- Día -->
+            <div class="field-group">
+
+              <label
+                for="registro-dia"
+                data-translate="registroDia"
+              ></label>
+
+              <input
+                type="date"
+                id="registro-dia"
+              />
+
+            </div>
+
+
+            <!-- Peso -->
+            <div class="field-group">
+
+              <label
+                for="registro-peso"
+                data-translate="registroPeso"
+              ></label>
+
+              <input
+                type="number"
+                id="registro-peso"
+                step="0.1"
+                inputmode="decimal"
+              />
+
+            </div>
+
+
+            <!-- Dosis -->
+            <div class="field-group">
+
+              <label
+                for="registro-dosis"
+                data-translate="registroDosis"
+              ></label>
+
+              <input
+                type="text"
+                id="registro-dosis"
+              />
+
+            </div>
+
+
+            <!-- Comentarios -->
+            <div class="field-group">
+
+              <label
+                for="registro-comentarios"
+                data-translate="registroComentarios"
+              ></label>
+
+              <textarea
+                id="registro-comentarios"
+                rows="3"
+              ></textarea>
+
+            </div>
+
+
+            <!-- Guardar -->
+            <button
+              id="btn-guardar"
+              class="primary-action"
+              type="submit"
+              data-translate="btnGuardar"
+            ></button>
+
+          </form>
         </div>
-        <div class="seg-progress"><div class="seg-bar"><div id="progress-fill" style="width:0%"></div></div><small id="progress-label">0%</small></div>
-        <div class="seg-actions">
-          <button id="mark-today" data-translate="markToday">Marcar dosis de hoy ✔</button>
-          <button id="add-note-today" data-translate="addNote">Agregar nota</button>
-          <button id="gen-days" data-translate="regenList">Regenerar lista</button>
+
+
+        <!--
+          Historial generado dinámicamente
+          desde script.js.
+        -->
+        <div id="historial"></div>
+
+      </section>
+
+
+      <!-- ==================================================
+           06. SEGUIMIENTO 84 + 84
+
+           Seguimiento de:
+           - 84 días de tratamiento
+           - 84 días de observación
+           - progreso total de 168 días
+           ================================================== -->
+
+      <section
+        id="seguimiento-section"
+        class="screen-section"
+        style="display: none;"
+      >
+
+        <!-- Título -->
+        <div class="section-heading">
+
+          <div>
+
+            <span class="eyebrow">
+              84 + 84
+            </span>
+
+            <h2
+              data-translate="seguimientoTitle"
+            >
+              Seguimiento
+            </h2>
+
+          </div>
+
+
+          <div
+            class="section-icon"
+            aria-hidden="true"
+          >
+            ✓
+          </div>
+
         </div>
-      </div>
-      <div id="seguimiento-list" class="seg-list"></div>
-    </section>
-  </main>
-</div>
-<script src="script.js"></script>
+
+
+        <!-- Card principal -->
+        <div class="content-card tracking-card">
+
+
+          <!-- Fechas -->
+          <div class="seg-row">
+
+
+            <!-- Inicio tratamiento -->
+            <div class="field-group">
+
+              <label>
+                Inicio tratamiento
+              </label>
+
+              <input
+                type="date"
+                id="treat-start"
+              />
+
+            </div>
+
+
+            <!-- Inicio observación -->
+            <div class="field-group">
+
+              <label>
+                Inicio observación
+              </label>
+
+              <input
+                type="date"
+                id="obs-start"
+              />
+
+            </div>
+
+          </div>
+
+
+          <!-- ==============================================
+               ESTADÍSTICAS DEL SEGUIMIENTO
+               ============================================== -->
+
+          <div class="seg-stats">
+
+
+            <!-- Fase actual -->
+            <div>
+
+              <span data-translate="treat">
+                Tratamiento
+              </span>
+
+              /
+
+              <span data-translate="obs">
+                Observación
+              </span>
+
+              <strong id="phase-now">
+                —
+              </strong>
+
+            </div>
+
+
+            <!-- Día de la fase -->
+            <div>
+
+              <span>
+                Día de la fase
+              </span>
+
+              <strong>
+                <span id="day-in-phase">
+                  —
+                </span>
+
+                / 84
+              </strong>
+
+            </div>
+
+
+            <!-- Día total -->
+            <div>
+
+              <span>
+                Día total
+              </span>
+
+              <strong>
+                <span id="day-global">
+                  —
+                </span>
+
+                / 168
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <!-- ==============================================
+               BARRA DE PROGRESO
+               ============================================== -->
+
+          <div class="seg-progress">
+
+            <div class="seg-bar">
+
+              <div
+                id="progress-fill"
+                style="width: 0%;"
+              ></div>
+
+            </div>
+
+            <small id="progress-label">
+              0%
+            </small>
+
+          </div>
+
+
+          <!-- ==============================================
+               ACCIONES
+               ============================================== -->
+
+          <div class="seg-actions">
+
+
+            <!-- Marcar dosis -->
+            <button
+              id="mark-today"
+              data-translate="markToday"
+            >
+              Marcar dosis de hoy ✔
+            </button>
+
+
+            <!-- Agregar nota -->
+            <button
+              id="add-note-today"
+              data-translate="addNote"
+            >
+              Agregar nota
+            </button>
+
+
+            <!-- Regenerar lista -->
+            <button
+              id="gen-days"
+              data-translate="regenList"
+            >
+              Regenerar lista
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!--
+          Lista de los días del seguimiento.
+
+          Se genera dinámicamente desde script.js.
+        -->
+        <div
+          id="seguimiento-list"
+          class="seg-list"
+        ></div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- ======================================================
+       07. JAVASCRIPT
+
+       Contiene la lógica de:
+       - calculadora
+       - traducciones
+       - tema light/dark
+       - registros
+       - localStorage
+       - seguimiento 84 + 84
+       - navegación
+       ====================================================== -->
+
+  <script src="./script.js"></script>
+
 </body>
+
 </html>

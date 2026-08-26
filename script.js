@@ -1,14 +1,32 @@
-/******************************
- * PIF/FIP Tracker – script.js (sin gráfico)
- * - Calculadora
- * - Registro (fecha por defecto = hoy, fallback al guardar)
- * - Tabs (Calc / Registro / Seguimiento) + onTabChanged() → Android
- * - Seguimiento (84 + 84, lista solo hasta hoy, notas y marcar dosis)
- * - i18n ES/EN
- * - Puentes: doCalculate() / doSaveRecord() para Android
- ******************************/
+/**************************************************************
+ * PIF / FIP TRACKER — script.js
+ *
+ * ÍNDICE
+ * 01. Helpers generales
+ * 02. Referencias del DOM
+ * 03. Tema claro / oscuro
+ * 04. Traducciones ES / EN
+ * 05. Datos de la calculadora
+ * 06. Render de la calculadora
+ * 07. Cálculo de dosis
+ * 08. Registro diario + localStorage
+ * 09. Bienestar diario
+ * 10. Gráficos de evolución (peso + bienestar)
+ * 11. Traducción dinámica
+ * 12. Eventos generales
+ * 13. Inicialización
+ * 14. Navegación por pestañas
+ * 15. Seguimiento 84 + 84
+ * 16. Puentes Android
+ *
+ * NOTA:
+ * Los gráficos se generan con SVG nativo.
+ * No requiere Chart.js ni ninguna dependencia externa.
+ **************************************************************/
 
-/* ========= Helpers ========= */
+/* =========================================================
+   01. HELPERS GENERALES
+   ========================================================= */
 function todayISO() {
   const d = new Date();
   const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -24,10 +42,14 @@ function setElementTextByTranslateAttr() {
   });
 }
 
-/* ========= Elementos base ========= */
+/* =========================================================
+   02. REFERENCIAS DEL DOM
+   ========================================================= */
 const languageSelect = document.getElementById("languageSelect");
 
-/* ========= Tema claro / oscuro ========= */
+/* =========================================================
+   03. TEMA CLARO / OSCURO
+   ========================================================= */
 const themeToggle = document.getElementById("theme-toggle");
 const themeColorMeta = document.getElementById("theme-color-meta");
 const systemDarkQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
@@ -93,7 +115,19 @@ const regDosis       = document.getElementById("registro-dosis");
 const regComentarios = document.getElementById("registro-comentarios");
 const historialList  = document.getElementById("historial");
 
-/* ========= i18n ========= */
+/* Bienestar diario
+   Los botones son radios con values: good / okay / bad. */
+const wellnessInputs = document.querySelectorAll('input[name="registro-bienestar"]');
+
+/* Contenedores de los gráficos.
+   Si todavía no agregaste el HTML correspondiente,
+   el script simplemente los ignora sin romper la app. */
+const weightChart = document.getElementById("weight-chart");
+const wellnessChart = document.getElementById("wellness-chart");
+
+/* =========================================================
+   04. TRADUCCIONES ES / EN
+   ========================================================= */
 const i18n = {
   es: {
     calcTitle: "PIF Tracker",
@@ -124,6 +158,21 @@ const i18n = {
     registroPeso: "Peso:",
     registroDosis: "Dosis:",
     registroComentarios: "Comentarios / Novedades:",
+
+    /* Bienestar diario */
+    bienestarPregunta: "¿Cómo estuvo tu michi hoy?",
+    bienestarGood: "Bien",
+    bienestarOkay: "Más o menos",
+    bienestarBad: "Mal",
+    bienestarLabel: "Bienestar:",
+
+    /* Gráficos */
+    evolutionTitle: "Evolución",
+    weightEvolution: "Evolución del peso",
+    wellnessEvolution: "Evolución del bienestar",
+    chartNeedWeight: "Registrá al menos dos controles de peso para ver la evolución.",
+    chartNeedWellness: "Registrá al menos dos días de bienestar para ver la evolución.",
+
     btnGuardar: "Guardar registro",
     editar: "✏️ Editar",
     borrar: "🗑️ Borrar",
@@ -172,6 +221,21 @@ const i18n = {
     registroPeso: "Weight:",
     registroDosis: "Dose:",
     registroComentarios: "Comments / Updates:",
+
+    /* Daily wellness */
+    bienestarPregunta: "How was your kitty today?",
+    bienestarGood: "Good",
+    bienestarOkay: "So-so",
+    bienestarBad: "Bad",
+    bienestarLabel: "Wellness:",
+
+    /* Charts */
+    evolutionTitle: "Evolution",
+    weightEvolution: "Weight evolution",
+    wellnessEvolution: "Wellness evolution",
+    chartNeedWeight: "Add at least two weight records to see the evolution.",
+    chartNeedWellness: "Add at least two wellness entries to see the evolution.",
+
     btnGuardar: "Save record",
     editar: "✏️ Edit",
     borrar: "🗑️ Delete",
@@ -194,7 +258,9 @@ const i18n = {
 };
 const t = (key) => i18n[languageSelect.value || "es"][key];
 
-/* ========= Datos de tipos ========= */
+/* =========================================================
+   05. DATOS DE LA CALCULADORA
+   ========================================================= */
 const TYPES_INYECTABLE = [
   { cat: "wet", dose: 8 }, { cat: "wet", dose: 9 }, { cat: "wet", dose: 10 },
   { cat: "dry", dose: 10 }, { cat: "ocular", dose: 10 },
@@ -207,7 +273,9 @@ const TYPES_TABLETS_ORAL = [
   { cat: "neuro", dose: 12 }, { cat: "neuro", dose: 15 }
 ];
 
-/* ========= Utils calc ========= */
+/* =========================================================
+   05.B UTILIDADES DE LA CALCULADORA
+   ========================================================= */
 function labelType(cat, dose) {
   const lang = languageSelect.value || "es";
   const name = i18n[lang].terms[cat] || cat;
@@ -226,7 +294,9 @@ function getPesoKg() {
   return peso;
 }
 
-/* ========= Render calculadora ========= */
+/* =========================================================
+   06. RENDER DE LA CALCULADORA
+   ========================================================= */
 function renderTipoOptions() {
   if (!tipoSelect) return;
   clearChildren(tipoSelect);
@@ -270,7 +340,9 @@ function renderAllForForma() {
   else { clearChildren(concContainer); }
 }
 
-/* ========= Cálculo ========= */
+/* =========================================================
+   07. CÁLCULO DE DOSIS
+   ========================================================= */
 function calcular() {
   if (!formaSelect) return;
   const forma = formaSelect.value;
@@ -314,7 +386,384 @@ function calcular() {
   }
 }
 
-/* ========= Registro (localStorage) ========= */
+/* =========================================================
+   08. REGISTRO DIARIO + LOCALSTORAGE
+   ========================================================= */
+
+/* =========================================================
+   09. BIENESTAR DIARIO
+
+   El usuario ve:
+   😺 Bien / Good
+   😐 Más o menos / So-so
+   😿 Mal / Bad
+
+   Internamente usamos:
+   good = 1
+   okay = 0
+   bad  = -1
+
+   El número nunca se muestra al usuario. Solo sirve
+   para dibujar la línea de evolución.
+   ========================================================= */
+
+const WELLNESS_VALUES = {
+  good: 1,
+  okay: 0,
+  bad: -1
+};
+
+function getSelectedWellness() {
+  const selected = document.querySelector(
+    'input[name="registro-bienestar"]:checked'
+  );
+
+  return selected?.value || "";
+}
+
+function clearSelectedWellness() {
+  wellnessInputs.forEach(input => {
+    input.checked = false;
+  });
+}
+
+function wellnessText(value) {
+  if (value === "good") return t("bienestarGood");
+  if (value === "okay") return t("bienestarOkay");
+  if (value === "bad") return t("bienestarBad");
+  return "—";
+}
+
+function wellnessEmoji(value) {
+  if (value === "good") return "😺";
+  if (value === "okay") return "😐";
+  if (value === "bad") return "😿";
+  return "";
+}
+
+
+/* =========================================================
+   10. GRÁFICOS DE EVOLUCIÓN
+
+   - Gráfico 1: peso registrado a lo largo del tiempo.
+   - Gráfico 2: bienestar diario percibido.
+
+   Se usa SVG nativo:
+   - no instala dependencias;
+   - funciona offline;
+   - funciona dentro del WebView Android;
+   - responde al modo claro / oscuro mediante CSS.
+   ========================================================= */
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+function parseHistoryDate(value) {
+  if (!value) return null;
+
+  const date = new Date(`${value}T00:00:00`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function sortedHistory() {
+  const data = JSON.parse(
+    localStorage.getItem("pif_historial") || "[]"
+  );
+
+  return data
+    .map(item => ({
+      ...item,
+      _date: parseHistoryDate(item.fecha)
+    }))
+    .filter(item => item._date)
+    .sort((a, b) => a._date - b._date);
+}
+
+function shortDateLabel(iso) {
+  if (!iso) return "";
+
+  const [year, month, day] = iso.split("-");
+
+  return (languageSelect.value || "es") === "en"
+    ? `${month}/${day}`
+    : `${day}/${month}`;
+}
+
+function createSvgElement(tag, attrs = {}) {
+  const el = document.createElementNS(SVG_NS, tag);
+
+  Object.entries(attrs).forEach(([key, value]) => {
+    el.setAttribute(key, String(value));
+  });
+
+  return el;
+}
+
+/**
+ * Dibuja una línea simple dentro de un contenedor.
+ *
+ * config:
+ * - points: [{ date, value }]
+ * - minY / maxY: límites verticales
+ * - formatY: texto del eje Y
+ * - emptyText: mensaje si hay menos de 2 registros
+ * - fixedTicks: valores concretos del eje Y (opcional)
+ */
+function renderLineChart(container, config) {
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  const {
+    points,
+    minY,
+    maxY,
+    formatY,
+    emptyText,
+    fixedTicks
+  } = config;
+
+  if (!points || points.length < 2) {
+    const empty = document.createElement("p");
+    empty.className = "chart-empty";
+    empty.textContent = emptyText;
+    container.appendChild(empty);
+    return;
+  }
+
+  const width = 600;
+  const height = 220;
+
+  const padding = {
+    top: 20,
+    right: 20,
+    bottom: 38,
+    left: 56
+  };
+
+  const plotWidth = width - padding.left - padding.right;
+  const plotHeight = height - padding.top - padding.bottom;
+
+  const svg = createSvgElement("svg", {
+    viewBox: `0 0 ${width} ${height}`,
+    role: "img",
+    "aria-hidden": "true",
+    preserveAspectRatio: "xMidYMid meet"
+  });
+
+  svg.classList.add("evolution-chart-svg");
+
+  /* -------------------------------------------------------
+     Escalas X / Y
+     ------------------------------------------------------- */
+
+  const xFor = index => (
+    points.length === 1
+      ? padding.left + plotWidth / 2
+      : padding.left +
+        (index / (points.length - 1)) * plotWidth
+  );
+
+  const safeRange = maxY - minY || 1;
+
+  const yFor = value => (
+    padding.top +
+    ((maxY - value) / safeRange) * plotHeight
+  );
+
+
+  /* -------------------------------------------------------
+     Líneas horizontales + etiquetas del eje Y
+     ------------------------------------------------------- */
+
+  const ticks = fixedTicks || [
+    maxY,
+    minY + safeRange / 2,
+    minY
+  ];
+
+  ticks.forEach(value => {
+    const y = yFor(value);
+
+    const grid = createSvgElement("line", {
+      x1: padding.left,
+      x2: width - padding.right,
+      y1: y,
+      y2: y
+    });
+
+    grid.classList.add("chart-grid-line");
+    svg.appendChild(grid);
+
+    const label = createSvgElement("text", {
+      x: padding.left - 10,
+      y: y + 4,
+      "text-anchor": "end"
+    });
+
+    label.classList.add("chart-axis-label");
+    label.textContent = formatY(value);
+    svg.appendChild(label);
+  });
+
+
+  /* -------------------------------------------------------
+     Línea principal
+     ------------------------------------------------------- */
+
+  const coordinates = points.map((point, index) => ({
+    x: xFor(index),
+    y: yFor(point.value),
+    point
+  }));
+
+  const pathData = coordinates
+    .map((point, index) =>
+      `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`
+    )
+    .join(" ");
+
+  const path = createSvgElement("path", {
+    d: pathData,
+    fill: "none"
+  });
+
+  path.classList.add("chart-line");
+  svg.appendChild(path);
+
+
+  /* -------------------------------------------------------
+     Puntos de cada registro
+     ------------------------------------------------------- */
+
+  coordinates.forEach(({ x, y }) => {
+    const dot = createSvgElement("circle", {
+      cx: x,
+      cy: y,
+      r: 4.5
+    });
+
+    dot.classList.add("chart-point");
+    svg.appendChild(dot);
+  });
+
+
+  /* -------------------------------------------------------
+     Fechas del primer y último punto
+     ------------------------------------------------------- */
+
+  const first = points[0];
+  const last = points[points.length - 1];
+
+  const firstLabel = createSvgElement("text", {
+    x: padding.left,
+    y: height - 10,
+    "text-anchor": "start"
+  });
+
+  firstLabel.classList.add("chart-axis-label");
+  firstLabel.textContent = shortDateLabel(first.date);
+  svg.appendChild(firstLabel);
+
+  const lastLabel = createSvgElement("text", {
+    x: width - padding.right,
+    y: height - 10,
+    "text-anchor": "end"
+  });
+
+  lastLabel.classList.add("chart-axis-label");
+  lastLabel.textContent = shortDateLabel(last.date);
+  svg.appendChild(lastLabel);
+
+  container.appendChild(svg);
+}
+
+
+function renderWeightChart(history) {
+  if (!weightChart) return;
+
+  const points = history
+    .filter(item =>
+      Number.isFinite(Number(item.peso)) &&
+      Number(item.peso) > 0
+    )
+    .map(item => ({
+      date: item.fecha,
+      value: Number(item.peso)
+    }));
+
+  if (points.length < 2) {
+    renderLineChart(weightChart, {
+      points,
+      minY: 0,
+      maxY: 1,
+      formatY: value => String(value),
+      emptyText: t("chartNeedWeight")
+    });
+
+    return;
+  }
+
+  const values = points.map(point => point.value);
+
+  let minY = Math.min(...values);
+  let maxY = Math.max(...values);
+
+  /* Agregamos un pequeño margen para que la línea
+     no quede pegada al borde superior/inferior. */
+  const range = maxY - minY;
+  const padding = range > 0 ? range * 0.18 : 0.25;
+
+  minY = Math.max(0, minY - padding);
+  maxY = maxY + padding;
+
+  renderLineChart(weightChart, {
+    points,
+    minY,
+    maxY,
+    formatY: value => `${value.toFixed(1)} kg`,
+    emptyText: t("chartNeedWeight")
+  });
+}
+
+
+function renderWellnessChart(history) {
+  if (!wellnessChart) return;
+
+  const points = history
+    .filter(item =>
+      Object.prototype.hasOwnProperty.call(
+        WELLNESS_VALUES,
+        item.bienestar
+      )
+    )
+    .map(item => ({
+      date: item.fecha,
+      value: WELLNESS_VALUES[item.bienestar]
+    }));
+
+  renderLineChart(wellnessChart, {
+    points,
+    minY: -1,
+    maxY: 1,
+    fixedTicks: [1, 0, -1],
+    formatY: value => {
+      if (value === 1) return `😺 ${t("bienestarGood")}`;
+      if (value === 0) return `😐 ${t("bienestarOkay")}`;
+      return `😿 ${t("bienestarBad")}`;
+    },
+    emptyText: t("chartNeedWellness")
+  });
+}
+
+
+function renderCharts() {
+  const history = sortedHistory();
+
+  renderWeightChart(history);
+  renderWellnessChart(history);
+}
+
+
 function loadHistorial() {
   if (!historialList) return;
   const data = JSON.parse(localStorage.getItem("pif_historial") || "[]");
@@ -326,6 +775,12 @@ function loadHistorial() {
       <div><strong>${item.fecha || "-"}</strong></div>
       <div>${t("registroPeso")} ${item.peso ?? "-"} kg</div>
       <div>${t("registroDosis")} ${item.dosis ?? "-"}</div>
+      <div class="historial-wellness">
+        ${t("bienestarLabel")}
+        <span class="wellness-history-value wellness-${item.bienestar || "none"}">
+          ${wellnessEmoji(item.bienestar)} ${wellnessText(item.bienestar)}
+        </span>
+      </div>
       <div>${t("registroComentarios")} ${item.comentarios || "-"}</div>
       <div class="historial-btns">
         <button class="edit">${t("editar")}</button>
@@ -339,6 +794,22 @@ function loadHistorial() {
         <div><input type="date" id="e_fecha" value="${item.fecha || ""}"></div>
         <div><input type="number" step="0.1" id="e_peso" value="${item.peso ?? ""}"></div>
         <div><input type="text" id="e_dosis" value="${item.dosis ?? ""}"></div>
+
+        <div>
+          <select id="e_bienestar">
+            <option value="">${t("bienestarLabel")} —</option>
+            <option value="good" ${item.bienestar === "good" ? "selected" : ""}>
+              😺 ${t("bienestarGood")}
+            </option>
+            <option value="okay" ${item.bienestar === "okay" ? "selected" : ""}>
+              😐 ${t("bienestarOkay")}
+            </option>
+            <option value="bad" ${item.bienestar === "bad" ? "selected" : ""}>
+              😿 ${t("bienestarBad")}
+            </option>
+          </select>
+        </div>
+
         <div><textarea id="e_comentarios" rows="2">${item.comentarios || ""}</textarea></div>
         <div class="historial-btns">
           <button class="save">${t("guardar")}</button>
@@ -351,6 +822,7 @@ function loadHistorial() {
         it.fecha = document.getElementById("e_fecha").value || todayISO();
         it.peso = parseFloat(document.getElementById("e_peso").value || "0");
         it.dosis = document.getElementById("e_dosis").value || "";
+        it.bienestar = document.getElementById("e_bienestar")?.value || "";
         it.comentarios = document.getElementById("e_comentarios").value || "";
         data2[idx] = it;
         localStorage.setItem("pif_historial", JSON.stringify(data2));
@@ -369,6 +841,10 @@ function loadHistorial() {
 
     historialList.appendChild(li);
   });
+
+  /* Cada vez que cambia el historial,
+     actualizamos también ambos gráficos. */
+  renderCharts();
 }
 
 if (registroForm) {
@@ -379,18 +855,26 @@ if (registroForm) {
       fecha: fechaElegida || todayISO(),   // Fallback si está vacío
       peso: parseFloat(regPeso?.value || "0"),
       dosis: regDosis?.value || "",
+      bienestar: getSelectedWellness(),
       comentarios: regComentarios?.value || ""
     };
     const data = JSON.parse(localStorage.getItem("pif_historial") || "[]");
     data.unshift(item);
     localStorage.setItem("pif_historial", JSON.stringify(data));
     registroForm.reset();
-    if (regDia) regDia.value = todayISO(); // deja hoy para el siguiente registro
+    clearSelectedWellness();
+
+    if (regDia) {
+      regDia.value = todayISO();
+    }
+
     loadHistorial();
   });
 }
 
-/* ========= Traducción dinámica ========= */
+/* =========================================================
+   11. TRADUCCIÓN DINÁMICA
+   ========================================================= */
 function applyTranslations() {
   setElementTextByTranslateAttr();
 
@@ -417,7 +901,9 @@ function applyTranslations() {
   loadHistorial();
 }
 
-/* ========= Eventos base ========= */
+/* =========================================================
+   12. EVENTOS GENERALES
+   ========================================================= */
 if (calcForm) calcForm.addEventListener("submit", e => { e.preventDefault(); calcular(); });
 if (formaSelect) formaSelect.addEventListener("change", renderAllForForma);
 if (customSubforma) {
@@ -440,7 +926,9 @@ if (languageSelect) {
   });
 }
 
-/* ========= Init ========= */
+/* =========================================================
+   13. INICIALIZACIÓN
+   ========================================================= */
 window.addEventListener("DOMContentLoaded", () => {
   if (!languageSelect.value) languageSelect.value = "es";
   applyTranslations();
@@ -452,7 +940,9 @@ window.addEventListener("DOMContentLoaded", () => {
   Seguimiento.init();
 });
 
-/* ====================== Tabs ======================= */
+/* =========================================================
+   14. NAVEGACIÓN POR PESTAÑAS
+   ========================================================= */
 const Tabs = (() => {
   const $ = (q) => document.querySelector(q);
   const $$ = (q) => document.querySelectorAll(q);
@@ -468,7 +958,13 @@ const Tabs = (() => {
     });
     localStorage.setItem("pif.tab", JSON.stringify(tab));
     if (tab === "registro") {
-      if (regDia && !regDia.value) regDia.value = todayISO(); // autocompletar fecha
+      if (regDia && !regDia.value) {
+        regDia.value = todayISO();
+      }
+
+      /* Refrescamos al entrar a Registro para que
+         los SVG usen siempre el tamaño correcto. */
+      window.requestAnimationFrame(renderCharts);
     }
 
     // 👉 Avisar a Android para intentar interstitial (con cooldown de 90s)
@@ -484,7 +980,9 @@ const Tabs = (() => {
   return { init, setActiveTab };
 })();
 
-/* ================== Seguimiento (84+84) ================= */
+/* =========================================================
+   15. SEGUIMIENTO 84 + 84
+   ========================================================= */
 const Seguimiento = (() => {
   const DAYS_PER_PHASE = 84;
   const TOTAL_DAYS     = 168;
@@ -660,7 +1158,9 @@ const Seguimiento = (() => {
   return { init, render, load };
 })();
 
-/* ========= Puentes para Android: ejecutar acciones tras el interstitial ========= */
+/* =========================================================
+   16. PUENTES ANDROID
+   ========================================================= */
 /** Android llama a Android.onCalculate() → MainActivity muestra ad → luego llama a doCalculate() */
 function doCalculate() {
   // Enviar el formulario de la calculadora
