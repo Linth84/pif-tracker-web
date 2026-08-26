@@ -156,6 +156,8 @@ const i18n = {
     historialTitle: "Historial",
     registroDia: "Día:",
     registroPeso: "Peso:",
+    weightUnit: "kg",
+    weightUnitUpper: "KG",
     registroDosis: "Dosis:",
     registroComentarios: "Comentarios / Novedades:",
 
@@ -165,6 +167,15 @@ const i18n = {
     bienestarOkay: "Más o menos",
     bienestarBad: "Mal",
     bienestarLabel: "Bienestar:",
+
+    /* Textos de Seguimiento 84 + 84 */
+    treatStartLabel: "Inicio tratamiento",
+    obsStartLabel: "Inicio observación",
+    phaseDayLabel: "Día de la fase",
+    totalDayLabel: "Día total",
+    evolutionEyebrow: "EVOLUCIÓN",
+    weightChartKicker: "PESO",
+    wellnessChartKicker: "BIENESTAR",
 
     /* Gráficos */
     evolutionTitle: "Evolución",
@@ -200,7 +211,7 @@ const i18n = {
     oral: "Oral (liquid)",
     custom: "Custom",
     tipoPIF: "Type of FIP:",
-    pesoGato: "Cat weight (lbs):",
+    pesoGato: "Cat weight (lb):",
     concentracion: "Concentration:",
     concentracionUnitsMl: "mg/ml",
     concentracionUnitsTab: "mg per tablet",
@@ -219,6 +230,8 @@ const i18n = {
     historialTitle: "History",
     registroDia: "Day:",
     registroPeso: "Weight:",
+    weightUnit: "lb",
+    weightUnitUpper: "LB",
     registroDosis: "Dose:",
     registroComentarios: "Comments / Updates:",
 
@@ -228,6 +241,15 @@ const i18n = {
     bienestarOkay: "So-so",
     bienestarBad: "Bad",
     bienestarLabel: "Wellness:",
+
+    /* 84 + 84 follow-up labels */
+    treatStartLabel: "Treatment start",
+    obsStartLabel: "Observation start",
+    phaseDayLabel: "Phase day",
+    totalDayLabel: "Total day",
+    evolutionEyebrow: "EVOLUTION",
+    weightChartKicker: "WEIGHT",
+    wellnessChartKicker: "WELLNESS",
 
     /* Charts */
     evolutionTitle: "Evolution",
@@ -288,10 +310,80 @@ function roundTabletsRule(n) {
   if (frac < 0.8) return base + 0.5;
   return base + 1;
 }
+/* =========================================================
+   05.B UNIDADES DE PESO // KG ↔ LB
+
+   REGLA DE DATOS:
+   - Internamente SIEMPRE trabajamos y guardamos kg.
+   - Español muestra/recibe kg.
+   - Inglés muestra/recibe lb (pounds).
+
+   Esto mantiene compatibles los registros viejos:
+   item.peso de versiones anteriores ya estaba expresado en kg.
+   ========================================================= */
+
+const LB_TO_KG = 0.45359237;
+const KG_TO_LB = 1 / LB_TO_KG;
+
+function currentWeightUnit() {
+  return (languageSelect.value || "es") === "en" ? "lb" : "kg";
+}
+
+function displayWeightFromKg(kg, lang = languageSelect.value || "es") {
+  const value = Number(kg);
+  if (!Number.isFinite(value)) return 0;
+  return lang === "en" ? value * KG_TO_LB : value;
+}
+
+function weightInputToKg(value, lang = languageSelect.value || "es") {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return 0;
+  return lang === "en" ? number * LB_TO_KG : number;
+}
+
+function formatWeightFromKg(kg, lang = languageSelect.value || "es") {
+  const displayed = displayWeightFromKg(kg, lang);
+  return `${displayed.toFixed(1)} ${lang === "en" ? "lb" : "kg"}`;
+}
+
+/* Calculadora:
+   el usuario escribe kg en ES o lb en EN;
+   el cálculo siempre recibe kg. */
 function getPesoKg() {
-  let peso = parseFloat(inputPeso?.value || "0");
-  if ((languageSelect.value || "es") === "en") peso = peso * 0.45359237; // lbs -> kg
-  return peso;
+  return weightInputToKg(inputPeso?.value || "0");
+}
+
+/* Actualiza los pequeños indicadores de unidad del HTML. */
+function updateWeightUnitLabels() {
+  const lang = languageSelect.value || "es";
+  const unit = lang === "en" ? "lb" : "kg";
+  const unitUpper = unit.toUpperCase();
+
+  const calcUnit = document.getElementById("calc-weight-unit");
+  const regUnit = document.getElementById("registro-weight-unit");
+  const chartUnit = document.getElementById("weight-chart-unit");
+
+  if (calcUnit) calcUnit.textContent = unit;
+  if (regUnit) regUnit.textContent = unit;
+  if (chartUnit) chartUnit.textContent = unitUpper;
+}
+
+/* Si el usuario cambia ES ↔ EN con un peso ya escrito,
+   convertimos el número visible para conservar el mismo peso real. */
+function convertVisibleWeightInputs(fromLang, toLang) {
+  if (fromLang === toLang) return;
+
+  [inputPeso, regPeso].forEach(input => {
+    if (!input || input.value === "") return;
+
+    const raw = Number(input.value);
+    if (!Number.isFinite(raw) || raw <= 0) return;
+
+    const kg = weightInputToKg(raw, fromLang);
+    const converted = displayWeightFromKg(kg, toLang);
+
+    input.value = converted.toFixed(1);
+  });
 }
 
 /* =========================================================
@@ -681,6 +773,10 @@ function renderLineChart(container, config) {
 function renderWeightChart(history) {
   if (!weightChart) return;
 
+  const lang = languageSelect.value || "es";
+
+  /* item.peso se conserva SIEMPRE en kg.
+     Para EN convertimos únicamente el valor que se dibuja. */
   const points = history
     .filter(item =>
       Number.isFinite(Number(item.peso)) &&
@@ -688,7 +784,7 @@ function renderWeightChart(history) {
     )
     .map(item => ({
       date: item.fecha,
-      value: Number(item.peso)
+      value: displayWeightFromKg(Number(item.peso), lang)
     }));
 
   if (points.length < 2) {
@@ -699,19 +795,17 @@ function renderWeightChart(history) {
       formatY: value => String(value),
       emptyText: t("chartNeedWeight")
     });
-
     return;
   }
 
   const values = points.map(point => point.value);
-
   let minY = Math.min(...values);
   let maxY = Math.max(...values);
 
-  /* Agregamos un pequeño margen para que la línea
-     no quede pegada al borde superior/inferior. */
   const range = maxY - minY;
-  const padding = range > 0 ? range * 0.18 : 0.25;
+  const padding = range > 0
+    ? range * 0.18
+    : (lang === "en" ? 0.5 : 0.25);
 
   minY = Math.max(0, minY - padding);
   maxY = maxY + padding;
@@ -720,7 +814,8 @@ function renderWeightChart(history) {
     points,
     minY,
     maxY,
-    formatY: value => `${value.toFixed(1)} kg`,
+    formatY: value =>
+      `${value.toFixed(1)} ${lang === "en" ? "lb" : "kg"}`,
     emptyText: t("chartNeedWeight")
   });
 }
@@ -773,7 +868,7 @@ function loadHistorial() {
     li.classList.add("historial-item");
     li.innerHTML = `
       <div><strong>${item.fecha || "-"}</strong></div>
-      <div>${t("registroPeso")} ${item.peso ?? "-"} kg</div>
+      <div>${t("registroPeso")} ${item.peso ? formatWeightFromKg(item.peso) : "-"}</div>
       <div>${t("registroDosis")} ${item.dosis ?? "-"}</div>
       <div class="historial-wellness">
         ${t("bienestarLabel")}
@@ -792,7 +887,15 @@ function loadHistorial() {
     li.querySelector(".edit").addEventListener("click", () => {
       li.innerHTML = `
         <div><input type="date" id="e_fecha" value="${item.fecha || ""}"></div>
-        <div><input type="number" step="0.1" id="e_peso" value="${item.peso ?? ""}"></div>
+        <div class="history-edit-weight">
+          <input
+            type="number"
+            step="0.1"
+            id="e_peso"
+            value="${item.peso ? displayWeightFromKg(item.peso).toFixed(1) : ""}"
+          >
+          <span>${currentWeightUnit()}</span>
+        </div>
         <div><input type="text" id="e_dosis" value="${item.dosis ?? ""}"></div>
 
         <div>
@@ -820,7 +923,11 @@ function loadHistorial() {
         const data2 = JSON.parse(localStorage.getItem("pif_historial") || "[]");
         const it = data2[idx] || {};
         it.fecha = document.getElementById("e_fecha").value || todayISO();
-        it.peso = parseFloat(document.getElementById("e_peso").value || "0");
+        /* El editor muestra kg o lb según el idioma,
+           pero el almacenamiento vuelve siempre a kg. */
+        it.peso = weightInputToKg(
+          document.getElementById("e_peso").value || "0"
+        );
         it.dosis = document.getElementById("e_dosis").value || "";
         it.bienestar = document.getElementById("e_bienestar")?.value || "";
         it.comentarios = document.getElementById("e_comentarios").value || "";
@@ -853,7 +960,9 @@ if (registroForm) {
     const fechaElegida = (regDia?.value || "").trim();
     const item = {
       fecha: fechaElegida || todayISO(),   // Fallback si está vacío
-      peso: parseFloat(regPeso?.value || "0"),
+      /* El usuario puede escribir kg (ES) o lb (EN).
+         Guardamos SIEMPRE kg para mantener una única fuente de verdad. */
+      peso: weightInputToKg(regPeso?.value || "0"),
       dosis: regDosis?.value || "",
       bienestar: getSelectedWellness(),
       comentarios: regComentarios?.value || ""
@@ -877,6 +986,7 @@ if (registroForm) {
    ========================================================= */
 function applyTranslations() {
   setElementTextByTranslateAttr();
+  updateWeightUnitLabels();
 
   // Opciones del select de "custom subforma"
   if (customSubforma) {
@@ -918,10 +1028,28 @@ if (customSubforma) {
   });
 }
 if (languageSelect) {
+  /* Guardamos el idioma anterior para poder convertir
+     cualquier peso que el usuario tenga escrito al cambiar ES ↔ EN. */
+  let previousLanguage = languageSelect.value || "es";
+
   languageSelect.addEventListener("change", () => {
+    const nextLanguage = languageSelect.value || "es";
+
+    convertVisibleWeightInputs(previousLanguage, nextLanguage);
+    previousLanguage = nextLanguage;
+
     applyTranslations();
-    applyTheme(document.documentElement.getAttribute("data-theme") || getPreferredTheme());
-    if (formaSelect?.value !== "custom") renderConcentrationUI();
+    applyTheme(
+      document.documentElement.getAttribute("data-theme") ||
+      getPreferredTheme()
+    );
+
+    if (formaSelect?.value !== "custom") {
+      renderConcentrationUI();
+    }
+
+    /* Historial y gráficos se vuelven a dibujar con kg o lb. */
+    loadHistorial();
     Seguimiento.render();
   });
 }
@@ -932,6 +1060,7 @@ if (languageSelect) {
 window.addEventListener("DOMContentLoaded", () => {
   if (!languageSelect.value) languageSelect.value = "es";
   applyTranslations();
+  updateWeightUnitLabels();
   if (formaSelect) formaSelect.value = "inyectable";
   renderAllForForma();
   if (regDia && !regDia.value) regDia.value = todayISO(); // fecha por defecto en Registro

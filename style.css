@@ -476,8 +476,19 @@ form select:focus, form input:focus, form textarea:focus, .field-group input:foc
   margin-top: 4px;
 }
 
-.wellness-field > label {
-  margin-bottom: 10px;
+.wellness-field {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.wellness-field > legend {
+  width: 100%;
+  margin: 0 0 10px;
+  padding: 0;
+  color: var(--field-label);
+  font-size: 12px;
+  font-weight: 750;
 }
 
 .wellness-options {
@@ -500,7 +511,7 @@ form select:focus, form input:focus, form textarea:focus, .field-group input:foc
   pointer-events: none;
 }
 
-.wellness-option span {
+.wellness-option > .wellness-button {
   min-height: 64px;
 
   display: flex;
@@ -531,16 +542,16 @@ form select:focus, form input:focus, form textarea:focus, .field-group input:foc
     box-shadow .18s ease;
 }
 
-.wellness-option .wellness-emoji {
+.wellness-option > .wellness-button > .wellness-emoji {
   font-size: 20px;
   line-height: 1;
 }
 
-.wellness-option:hover span {
+.wellness-option:hover > .wellness-button {
   border-color: var(--field-focus);
 }
 
-.wellness-option input:checked + span {
+.wellness-option > input:checked + .wellness-button {
   border-color: var(--primary);
 
   background: var(--primary-soft);
@@ -550,7 +561,7 @@ form select:focus, form input:focus, form textarea:focus, .field-group input:foc
     0 0 0 3px var(--primary-soft);
 }
 
-.wellness-option input:focus-visible + span {
+.wellness-option > input:focus-visible + .wellness-button {
   outline: 3px solid var(--primary-soft);
   outline-offset: 2px;
 }
@@ -742,6 +753,71 @@ form select:focus, form input:focus, form textarea:focus, .field-group input:foc
 }
 
 
+/* =========================================================
+   12.B COMPATIBILIDAD CON EL HTML ACTUAL DE LOS GRÁFICOS
+
+   El HTML usa chart-card / chart-header / chart-container.
+   Estas reglas mantienen el mismo diseño que evolution-card.
+   ========================================================= */
+
+.chart-card {
+  overflow: hidden;
+  margin-bottom: 12px;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.chart-header h4 {
+  margin: 2px 0 0;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.chart-kicker, .chart-unit {
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.chart-container {
+  min-height: 180px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 13px;
+  background: var(--surface-soft);
+}
+
+.wellness-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.wellness-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+
 .seg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
 .seg-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 4px 0 16px; }
@@ -815,7 +891,7 @@ body, #tabs, .content-card, .language-control, .theme-toggle, form select, form 
 .custom-panel, .result-card, .warning-card, .historial-item, .seg-list, .seg-stats div, .seg-actions button,
 
 .day-item, .day-item .phase, .day-item .actions button,
-.wellness-option span, .evolution-card, .evolution-chart {
+.wellness-option > .wellness-button, .evolution-card, .evolution-chart, .chart-card, .chart-container {
 
   transition: background-color .22s ease, border-color .22s ease, color .22s ease, box-shadow .22s ease;
 
@@ -848,13 +924,13 @@ body, #tabs, .content-card, .language-control, .theme-toggle, form select, form 
   /* Bienestar sigue en tres columnas, pero más compacto. */
   .wellness-options { gap: 6px; }
 
-  .wellness-option span {
+  .wellness-option > .wellness-button {
     min-height: 60px;
     padding: 8px 4px;
     font-size: 10px;
   }
 
-  .wellness-option .wellness-emoji {
+  .wellness-option > .wellness-button > .wellness-emoji {
     font-size: 18px;
   }
 
@@ -912,4 +988,65 @@ select option:disabled {
 
   color: #6b7280;
 
+}
+
+/* =========================================================
+   14.B TELÉFONOS MUY ANGOSTOS
+
+   Evita que las tres opciones de bienestar se deformen.
+   ========================================================= */
+@media (max-width: 360px) {
+  .wellness-options { gap: 5px; }
+  .wellness-option > .wellness-button {
+    min-height: 62px;
+    padding: 8px 2px;
+    font-size: 9px;
+  }
+  .wellness-option > .wellness-button > .wellness-emoji {
+    font-size: 18px;
+  }
+}
+
+
+/* =========================================================
+   17. EDICIÓN DE PESO EN EL HISTORIAL // KG · LB
+
+   Cuando se edita un registro:
+   - ES muestra kg
+   - EN muestra lb
+
+   La unidad aparece dentro del campo, igual que en
+   Calculadora y Registro.
+   ========================================================= */
+
+.history-edit-weight {
+  position: relative;
+}
+
+.history-edit-weight input {
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 48px 9px 11px;
+  border: 1px solid var(--field-border);
+  border-radius: 11px;
+  outline: none;
+  background: var(--surface-soft);
+  color: var(--text);
+}
+
+.history-edit-weight > span {
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.history-edit-weight input:focus {
+  border-color: var(--field-focus);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px var(--primary-soft);
 }

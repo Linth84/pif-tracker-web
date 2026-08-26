@@ -586,7 +586,13 @@
                   inputmode="decimal"
                 />
 
-                <span>
+                <!--
+                  Unidad dinámica:
+                  ES = kg
+                  EN = lb
+                  script.js actualiza este texto.
+                -->
+                <span id="calc-weight-unit">
                   kg
                 </span>
 
@@ -635,24 +641,34 @@
 
 
       <!-- ==================================================
-           05. REGISTRO
+     05. REGISTRO + EVOLUCIÓN
 
-           Permite guardar:
-           - fecha
-           - peso
-           - dosis
-           - comentarios
+     Permite guardar el registro diario del michi:
 
-           Los datos quedan guardados en localStorage.
-           ================================================== -->
+     - fecha
+     - peso
+     - dosis
+     - bienestar percibido
+     - comentarios
+
+     Además muestra dos gráficos:
+
+     01. Evolución del peso
+     02. Evolución del bienestar
+
+     Los datos se guardan en localStorage.
+     ================================================== -->
 
       <section
-        id="registro-section"
-        class="screen-section"
-        style="display: none;"
+              id="registro-section"
+              class="screen-section"
+              style="display: none;"
       >
 
-        <!-- Título -->
+        <!-- ================================================
+             05.1 ENCABEZADO
+             ================================================ -->
+
         <div class="section-heading">
 
           <div>
@@ -661,15 +677,15 @@
               PIF Tracker
             </span>
 
-            <h2
-              data-translate="historialTitle"
-            ></h2>
+            <h2 data-translate="historialTitle">
+              Registro diario
+            </h2>
 
           </div>
 
           <div
-            class="section-icon"
-            aria-hidden="true"
+                  class="section-icon"
+                  aria-hidden="true"
           >
             ✎
           </div>
@@ -677,94 +693,450 @@
         </div>
 
 
-        <!-- Formulario -->
+        <!-- ================================================
+             05.2 FORMULARIO DE REGISTRO
+
+             Cada envío crea una entrada en el historial.
+             ================================================ -->
+
         <div class="content-card">
 
           <form id="registro-form">
 
 
-            <!-- Día -->
+            <!-- ============================================
+                 FECHA
+                 ============================================ -->
+
             <div class="field-group">
 
               <label
-                for="registro-dia"
-                data-translate="registroDia"
-              ></label>
+                      for="registro-dia"
+                      data-translate="registroDia"
+              >
+                Día
+              </label>
 
               <input
-                type="date"
-                id="registro-dia"
+                      type="date"
+                      id="registro-dia"
               />
 
             </div>
 
 
-            <!-- Peso -->
+            <!-- ============================================
+                 PESO
+
+                 Este dato también alimenta automáticamente
+                 el gráfico "Evolución del peso".
+                 ============================================ -->
+
             <div class="field-group">
 
               <label
-                for="registro-peso"
-                data-translate="registroPeso"
-              ></label>
+                      for="registro-peso"
+                      data-translate="registroPeso"
+              >
+                Peso
+              </label>
+
+              <div class="input-with-unit">
+
+                <input
+                        type="number"
+                        id="registro-peso"
+                        step="0.1"
+                        inputmode="decimal"
+                />
+
+                <!--
+                  Unidad dinámica del Registro:
+                  ES = kg
+                  EN = lb
+
+                  IMPORTANTE:
+                  visualmente cambia la unidad, pero script.js
+                  normaliza el dato y lo guarda internamente en kg.
+                -->
+                <span id="registro-weight-unit">
+                  kg
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <!-- ============================================
+                 DOSIS
+                 ============================================ -->
+
+            <div class="field-group">
+
+              <label
+                      for="registro-dosis"
+                      data-translate="registroDosis"
+              >
+                Dosis
+              </label>
 
               <input
-                type="number"
-                id="registro-peso"
-                step="0.1"
-                inputmode="decimal"
+                      type="text"
+                      id="registro-dosis"
               />
 
             </div>
 
 
-            <!-- Dosis -->
+            <!-- ============================================
+                 05.3 BIENESTAR DIARIO
+
+                 Pregunta al usuario cómo estuvo su michi.
+
+                 Valores internos:
+
+                 good = 1
+                 okay = 0
+                 bad  = -1
+
+                 Estos números NO se muestran al usuario.
+                 Solamente se utilizan para dibujar
+                 el gráfico de evolución.
+                 ============================================ -->
+
+            <fieldset class="wellness-field">
+
+              <legend data-translate="bienestarPregunta">
+                ¿Cómo estuvo tu michi hoy?
+              </legend>
+
+
+              <!-- BIEN -->
+
+              <div class="wellness-options">
+
+<label class="wellness-option">
+
+                <input
+                        type="radio"
+                        name="registro-bienestar"
+                        value="good"
+                />
+
+                <span class="wellness-button">
+
+                  <span
+                          class="wellness-emoji"
+                          aria-hidden="true"
+                  >
+                    😺
+                  </span>
+
+                  <span data-translate="bienestarGood">
+                    Bien
+                  </span>
+
+                </span>
+
+              </label>
+
+
+              <!-- MÁS O MENOS -->
+
+              <label class="wellness-option">
+
+                <input
+                        type="radio"
+                        name="registro-bienestar"
+                        value="okay"
+                />
+
+                <span class="wellness-button">
+
+                  <span
+                          class="wellness-emoji"
+                          aria-hidden="true"
+                  >
+                    😐
+                  </span>
+
+                  <span data-translate="bienestarOkay">
+                    Más o menos
+                  </span>
+
+                </span>
+
+              </label>
+
+
+              <!-- MAL -->
+
+              <label class="wellness-option">
+
+                <input
+                        type="radio"
+                        name="registro-bienestar"
+                        value="bad"
+                />
+
+                <span class="wellness-button">
+
+                  <span
+                          class="wellness-emoji"
+                          aria-hidden="true"
+                  >
+                    😿
+                  </span>
+
+                  <span data-translate="bienestarBad">
+                    Mal
+                  </span>
+
+                </span>
+
+              </label>
+
+              </div>
+
+            </fieldset>
+
+
+            <!-- ============================================
+                 COMENTARIOS
+
+                 Campo libre para anotar observaciones
+                 sobre el día.
+                 ============================================ -->
+
             <div class="field-group">
 
               <label
-                for="registro-dosis"
-                data-translate="registroDosis"
-              ></label>
-
-              <input
-                type="text"
-                id="registro-dosis"
-              />
-
-            </div>
-
-
-            <!-- Comentarios -->
-            <div class="field-group">
-
-              <label
-                for="registro-comentarios"
-                data-translate="registroComentarios"
-              ></label>
+                      for="registro-comentarios"
+                      data-translate="registroComentarios"
+              >
+                Comentarios
+              </label>
 
               <textarea
-                id="registro-comentarios"
-                rows="3"
+                      id="registro-comentarios"
+                      rows="3"
               ></textarea>
 
             </div>
 
 
-            <!-- Guardar -->
+            <!-- ============================================
+                 GUARDAR REGISTRO
+                 ============================================ -->
+
             <button
-              id="btn-guardar"
-              class="primary-action"
-              type="submit"
-              data-translate="btnGuardar"
-            ></button>
+                    id="btn-guardar"
+                    class="primary-action"
+                    type="submit"
+                    data-translate="btnGuardar"
+            >
+              Guardar registro
+            </button>
 
           </form>
+
         </div>
 
 
-        <!--
-          Historial generado dinámicamente
-          desde script.js.
-        -->
+        <!-- ==================================================
+             05.4 EVOLUCIÓN
+
+             Los gráficos se generan desde script.js.
+
+             No utilizan Chart.js ni librerías externas:
+             se dibujan mediante SVG.
+             ================================================== -->
+
+        <div class="evolution-section">
+
+
+          <!-- ================================================
+               TÍTULO DE EVOLUCIÓN
+               ================================================ -->
+
+          <div class="evolution-heading">
+
+            <span
+                    class="eyebrow"
+                    data-translate="evolutionEyebrow"
+            >
+              EVOLUCIÓN
+            </span>
+
+            <h3 data-translate="evolutionTitle">
+              Seguimiento visual
+            </h3>
+
+          </div>
+
+
+          <!-- ================================================
+               05.5 GRÁFICO DE PESO
+
+               Toma los valores introducidos en:
+
+               #registro-peso
+
+               Necesita al menos dos registros con peso
+               para dibujar una evolución.
+               ================================================ -->
+
+          <article class="chart-card">
+
+            <div class="chart-header">
+
+              <div>
+
+                <span
+                        class="chart-kicker"
+                        data-translate="weightChartKicker"
+                >
+                  PESO
+                </span>
+
+                <h4 data-translate="weightEvolution">
+                  Evolución del peso
+                </h4>
+
+              </div>
+
+              <!-- Unidad dinámica del gráfico de peso -->
+              <span
+                id="weight-chart-unit"
+                class="chart-unit"
+              >
+                KG
+              </span>
+
+            </div>
+
+
+            <!--
+              script.js inserta acá el SVG
+              correspondiente al gráfico de peso.
+            -->
+
+            <div
+                    id="weight-chart"
+                    class="chart-container"
+                    aria-live="polite"
+            >
+
+              <p
+                      class="chart-empty"
+                      data-translate="chartNeedWeight"
+              >
+                Agregá al menos 2 registros para visualizar la evolución.
+              </p>
+
+            </div>
+
+          </article>
+
+
+          <!-- ================================================
+               05.6 GRÁFICO DE BIENESTAR
+
+               Utiliza las respuestas:
+
+               😺 Bien          =  1
+               😐 Más o menos  =  0
+               😿 Mal           = -1
+
+               El usuario solamente ve las etiquetas,
+               nunca los valores numéricos.
+               ================================================ -->
+
+          <article class="chart-card">
+
+            <div class="chart-header">
+
+              <div>
+
+                <span
+                        class="chart-kicker"
+                        data-translate="wellnessChartKicker"
+                >
+                  BIENESTAR
+                </span>
+
+                <h4 data-translate="wellnessEvolution">
+                  Evolución del bienestar
+                </h4>
+
+              </div>
+
+            </div>
+
+
+            <!--
+              Leyenda visual del gráfico.
+            -->
+
+            <div class="wellness-legend">
+
+              <span>
+                😺
+                <span data-translate="bienestarGood">
+                  Bien
+                </span>
+              </span>
+
+              <span>
+                😐
+                <span data-translate="bienestarOkay">
+                  Más o menos
+                </span>
+              </span>
+
+              <span>
+                😿
+                <span data-translate="bienestarBad">
+                  Mal
+                </span>
+              </span>
+
+            </div>
+
+
+            <!--
+              script.js inserta acá el SVG
+              correspondiente al bienestar diario.
+            -->
+
+            <div
+                    id="wellness-chart"
+                    class="chart-container wellness-chart-container"
+                    aria-live="polite"
+            >
+
+              <p
+                      class="chart-empty"
+                      data-translate="chartNeedWellness"
+              >
+                Agregá al menos 2 registros de bienestar para visualizar la evolución.
+              </p>
+
+            </div>
+
+          </article>
+
+        </div>
+
+
+        <!-- ==================================================
+             05.7 HISTORIAL
+
+             script.js genera acá las entradas guardadas
+             previamente en localStorage.
+             ================================================== -->
+
         <div id="historial"></div>
 
       </section>
@@ -824,7 +1196,7 @@
             <!-- Inicio tratamiento -->
             <div class="field-group">
 
-              <label>
+              <label data-translate="treatStartLabel">
                 Inicio tratamiento
               </label>
 
@@ -839,7 +1211,7 @@
             <!-- Inicio observación -->
             <div class="field-group">
 
-              <label>
+              <label data-translate="obsStartLabel">
                 Inicio observación
               </label>
 
@@ -883,7 +1255,7 @@
             <!-- Día de la fase -->
             <div>
 
-              <span>
+              <span data-translate="phaseDayLabel">
                 Día de la fase
               </span>
 
@@ -901,7 +1273,7 @@
             <!-- Día total -->
             <div>
 
-              <span>
+              <span data-translate="totalDayLabel">
                 Día total
               </span>
 
