@@ -1,263 +1,61 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <!-- ======================================================
-       ÍNDICE DEL <HEAD>
-
-       01. CONFIGURACIÓN GENERAL
-       02. SEO BÁSICO
-       03. FAVICON
-       04. OPEN GRAPH
-       05. X / TWITTER CARD
-       06. ESTILOS
-       ====================================================== -->
-
-
-  <!-- ======================================================
-       01. CONFIGURACIÓN GENERAL
-       Define codificación, responsive y color del navegador.
-       ====================================================== -->
-
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#f5f6fa" id="theme-color-meta" />
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-  />
+  <!-- SEO -->
+  <title>PIF Tracker | Seguimiento del tratamiento contra el PIF</title>
+  <meta name="description" content="PIF Tracker ayuda a calcular dosis estimadas, registrar peso y bienestar, visualizar la evolución y acompañar los 84 días de tratamiento + 84 días de observación del PIF." />
+  <meta name="author" content="Edgardo Villalba" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <link rel="canonical" href="https://edgardovillalba.is-a.dev/pif-tracker-web/" />
+  <link rel="icon" type="image/x-icon" href="./favicon.ico" />
 
-  <!--
-    Este meta puede ser actualizado desde script.js
-    cuando se cambia entre modo claro y oscuro.
-  -->
-  <meta
-    name="theme-color"
-    content="#f5f6fa"
-    id="theme-color-meta"
-  />
+  <!-- Open Graph / Discord / WhatsApp / LinkedIn -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="PIF Tracker" />
+  <meta property="og:url" content="https://edgardovillalba.is-a.dev/pif-tracker-web/" />
+  <meta property="og:title" content="PIF Tracker — Cada día cuenta" />
+  <meta property="og:description" content="Seguimiento diario para acompañar los 84 días de tratamiento + 84 días de observación del PIF." />
+  <meta property="og:image" content="https://edgardovillalba.is-a.dev/pif-tracker-web/pif-tracker-card.png" />
+  <meta property="og:image:secure_url" content="https://edgardovillalba.is-a.dev/pif-tracker-web/pif-tracker-card.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="PIF Tracker — Cada día cuenta" />
+  <meta property="og:locale" content="es_AR" />
+  <meta property="og:locale:alternate" content="en_US" />
 
+  <!-- X / Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="PIF Tracker — Cada día cuenta" />
+  <meta name="twitter:description" content="Seguimiento diario para acompañar los 84 días de tratamiento + 84 días de observación del PIF." />
+  <meta name="twitter:image" content="https://edgardovillalba.is-a.dev/pif-tracker-web/pif-tracker-card.png" />
+  <meta name="twitter:image:alt" content="PIF Tracker — Cada día cuenta" />
 
-  <!-- ======================================================
-       02. SEO BÁSICO
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "PIF Tracker",
+    "url": "https://edgardovillalba.is-a.dev/pif-tracker-web/",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web browser",
+    "inLanguage": ["es", "en"],
+    "description": "Herramienta de apoyo para registrar y visualizar el seguimiento diario del tratamiento y observación del PIF.",
+    "author": {
+      "@type": "Person",
+      "name": "Edgardo Villalba",
+      "url": "https://edgardovillalba.is-a.dev/"
+    },
+    "isAccessibleForFree": true
+  }
+  </script>
 
-       Título y descripción que pueden usar Google
-       y otros buscadores.
-       ====================================================== -->
-
-  <title>
-    PIF Tracker — Seguimiento del tratamiento contra el PIF
-  </title>
-
-  <meta
-    name="description"
-    content="PIF Tracker ayuda a calcular dosis, registrar el tratamiento y realizar el seguimiento de los 84 días de tratamiento y 84 días de observación."
-  />
-
-  <!--
-    URL oficial de esta página.
-
-    Evita que los buscadores interpreten distintas variantes
-    de la URL como páginas diferentes.
-  -->
-  <link
-    rel="canonical"
-    href="https://edgardovillalba.is-a.dev/pif-tracker-web/"
-  />
-
-
-  <!-- ======================================================
-       03. FAVICON
-
-       Icono pequeño que aparece en:
-       - pestaña del navegador
-       - favoritos
-       - accesos directos
-       ====================================================== -->
-
-  <link
-    rel="icon"
-    type="image/x-icon"
-    href="./favicon.ico"
-  />
-
-
-  <!-- ======================================================
-       04. OPEN GRAPH
-
-       Utilizado principalmente cuando compartís el link en:
-       - Discord
-       - WhatsApp
-       - LinkedIn
-       - Facebook
-       - Telegram
-       - otras plataformas compatibles
-
-       La imagen actual mide:
-       1536 × 1024 px
-       ====================================================== -->
-
-  <!-- Tipo de contenido -->
-  <meta
-    property="og:type"
-    content="website"
-  />
-
-  <!-- URL pública de PIF Tracker -->
-  <meta
-    property="og:url"
-    content="https://edgardovillalba.is-a.dev/pif-tracker-web/"
-  />
-
-  <!-- Nombre del sitio -->
-  <meta
-    property="og:site_name"
-    content="PIF Tracker"
-  />
-
-  <!-- Título que aparece en la tarjeta -->
-  <meta
-    property="og:title"
-    content="PIF Tracker — Tu compañero en la lucha contra el PIF"
-  />
-
-  <!-- Descripción que aparece debajo del título -->
-  <meta
-    property="og:description"
-    content="Calcula dosis, registra el tratamiento y acompaña los 84 días de tratamiento + 84 días de observación."
-  />
-
-  <!--
-    Imagen de la social card.
-
-    El archivo pif-tracker-card.png debe estar
-    en la raíz del repositorio, junto a index.html.
-  -->
-  <meta
-    property="og:image"
-    content="https://edgardovillalba.is-a.dev/pif-tracker-web/pif-tracker-card.png"
-  />
-
-  <meta
-    property="og:image:width"
-    content="1200"
-  />
-
-  <meta
-    property="og:image:height"
-    content="630"
-  />
-
-  <!-- Tipo del archivo -->
-  <meta
-    property="og:image:type"
-    content="image/png"
-  />
-
-  <!-- Texto alternativo de la imagen -->
-  <meta
-    property="og:image:alt"
-    content="PIF Tracker — aplicación para el seguimiento del tratamiento contra el PIF"
-  />
-
-  <!-- Idioma / región principal -->
-  <meta
-    property="og:locale"
-    content="es_AR"
-  />
-
-
-  <!-- ======================================================
-       05. X / TWITTER CARD
-
-       Hace que X / Twitter muestre una tarjeta
-       grande con la misma imagen.
-       ====================================================== -->
-
-  <!-- Tarjeta con imagen grande -->
-  <meta
-    name="twitter:card"
-    content="summary_large_image"
-  />
-
-  <meta
-    name="twitter:title"
-    content="PIF Tracker — Tu compañero en la lucha contra el PIF"
-  />
-
-  <meta
-    name="twitter:description"
-    content="Calcula dosis, registra el tratamiento y acompaña los 84 días de tratamiento + 84 días de observación."
-  />
-
-  <meta
-    name="twitter:image"
-    content="https://edgardovillalba.is-a.dev/pif-tracker-web/pif-tracker-card.png"
-  />
-
-  <meta
-    name="twitter:image:alt"
-    content="PIF Tracker — aplicación para el seguimiento del tratamiento contra el PIF"
-  />
-
-  <!-- ======================================================
-     OPEN GRAPH // PREVIEW SOCIAL
-     Discord · WhatsApp · LinkedIn · Facebook
-     ====================================================== -->
-
-<meta property="og:type" content="website" />
-
-<meta
-  property="og:url"
-  content="https://edgardovillalba.is-a.dev/pif-tracker-web/"
-/>
-
-<meta
-  property="og:title"
-  content="PIF Tracker — Tu compañero en la lucha contra el PIF"
-/>
-
-<meta
-  property="og:description"
-  content="Calcula dosis, registra el tratamiento y acompaña los 84 días de tratamiento + 84 días de observación."
-/>
-
-<meta
-  property="og:image"
-  content="https://edgardovillalba.is-a.dev/pif-tracker-web/pif-tracker-card.png"
-/>
-
-<!-- HTTPS explícito: útil para crawlers sociales -->
-<meta
-  property="og:image:secure_url"
-  content="https://edgardovillalba.is-a.dev/pif-tracker-web/pif-tracker-card.png"
-/>
-
-<!-- Tipo real del archivo -->
-<meta
-  property="og:image:type"
-  content="image/png"
-/>
-
-<!-- Dimensiones REALES de nuestra imagen -->
-<meta property="og:image:width" content="1536" />
-<meta property="og:image:height" content="1024" />
-
-<meta
-  property="og:image:alt"
-  content="PIF Tracker — seguimiento de tratamiento y observación del PIF"
-/>
-
-
-  <!-- ======================================================
-       06. ESTILOS
-
-       Archivo CSS principal de PIF Tracker.
-       ====================================================== -->
-
-  <link
-    rel="stylesheet"
-    href="./style.css"
-  />
+  <link rel="stylesheet" href="./style.css" />
 </head>
 
 

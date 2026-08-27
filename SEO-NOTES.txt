@@ -1,0 +1,16 @@
+PIF TRACKER — SEO UPDATE
+
+- Social card: pif-tracker-card.png (1200x630 exact)
+- Canonical: https://edgardovillalba.is-a.dev/pif-tracker-web/
+- Open Graph + X/Twitter metadata cleaned and deduplicated
+- robots meta: index, follow, max-image-preview:large
+- Schema.org WebApplication JSON-LD added
+- sitemap.xml added for PIF Tracker
+- No robots.txt was added here: robots.txt is host-level and must live at https://edgardovillalba.is-a.dev/robots.txt
+
+After deploy, verify:
+1. /pif-tracker-web/
+2. /pif-tracker-web/pif-tracker-card.png
+3. /pif-tracker-web/sitemap.xml
+
+Then use the already verified Search Console property for https://edgardovillalba.is-a.dev/ to inspect /pif-tracker-web/ and request indexing.
